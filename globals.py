@@ -14,5 +14,6 @@ errors = {
     "ACCES_DENIED": API_RESPONSE(False, "Acces denied"),
     "NO_ARGS": API_RESPONSE(False, "No args found in request"),
     "INCORRECT_LOGIN_VALUES": API_RESPONSE(False, "Incorrect login or password"),
-    "LOGIN_TRY_AGAIN": API_RESPONSE(False, "Smth went wrong try loggin in again")
+    "LOGIN_TRY_AGAIN": API_RESPONSE(False, "Smth went wrong try loggin in again"),
+    "FAILED_TO_ASSIGN_TOKEN": API_RESPONSE(False, "Failed to assign token to the user")
 }
