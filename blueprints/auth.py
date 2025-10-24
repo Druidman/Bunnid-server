@@ -9,3 +9,14 @@ def testRoute():
 
 
 
+@auth_bp.route("/login")
+def login():
+
+    return "<h1>Auth Bunnid API Login</h1>"
+
+@auth_bp.route("/reqister")
+def register():
+    return "<h1>Auth Bunnid API Register</h1>"
+
+
+
