@@ -8,11 +8,13 @@ def check_if_valid_token(token: str) -> bool:
     if (token == ""): return False
     if (len(token) < globals.USER_TOKEN_LENGTH): return False
 
-    return check_if_token_in_db(token, globals.dbConn.cursor())
-
+    result = check_if_token_in_db(token, globals.dbConn.cursor())
+    if not result["STATUS"]:
+        return False
+    return result["MSG"]
 
 def make_user_session() -> str:
-    token: str = secrets.token_urlsafe(16)
+    token: str = secrets.token_urlsafe(globals.USER_TOKEN_LENGTH)
     result = add_token_to_db(token=token, db=globals.dbConn.cursor())
     if not result["STATUS"]:
         print(f"Error when adding token: {result['MSG']}")
