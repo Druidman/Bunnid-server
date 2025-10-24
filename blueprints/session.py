@@ -1,7 +1,6 @@
 from flask import Blueprint, request
 
-
-from ..globals import errors, API_RESPONSE
+from server import globals
 from ..auth.user_session import userSession
 
 
@@ -15,7 +14,7 @@ def main_route():
 @session_bp.route("/getRTS", methods=["GET"])
 @userSession
 def get_realtime_session():
-    return API_RESPONSE(True, "Work in progress endpoint")
+    return globals.API_RESPONSE(True, "Work in progress endpoint")
 
 
 

@@ -1,9 +1,10 @@
 from flask import Flask
 from .blueprints import *
 from .db import connectDb
+from server import globals
 
-dbConn = connectDb()
-if not dbConn:
+globals.dbConn = connectDb()
+if not globals.dbConn:
     print("Error when connecting to db!")
     exit()
 
