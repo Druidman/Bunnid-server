@@ -16,7 +16,7 @@ def check_if_user_exists(login: str, password: str, db: sqlite3.Cursor) -> dict:
     if (resRows):
         return DB_RESULT(True, True)
     else:
-        return DB_RESULT(True, "Incorrect login or password")
+        return DB_RESULT(True, False)
 
 @dbFunction
 def add_new_user(name: str, login: str, password: str, db: sqlite3.Cursor) -> dict:

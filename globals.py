@@ -12,5 +12,7 @@ errors = {
 
     "NO_JSON": API_RESPONSE(False, "No json found in request"),
     "ACCES_DENIED": API_RESPONSE(False, "Acces denied"),
-    "NO_ARGS": API_RESPONSE(False, "No args found in request")
+    "NO_ARGS": API_RESPONSE(False, "No args found in request"),
+    "INCORRECT_LOGIN_VALUES": API_RESPONSE(False, "Incorrect login or password"),
+    "LOGIN_TRY_AGAIN": API_RESPONSE(False, "Smth went wrong try loggin in again")
 }
