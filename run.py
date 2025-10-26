@@ -2,7 +2,6 @@ from server.httpServer import run_http_server
 from server.wsServer import run_ws_server
 from server import globals
 from server.db import connectDb
-from threading import Thread
 
 
 
@@ -12,9 +11,9 @@ if __name__ == "__main__":
         print("Error when connecting to db!")
         exit()
     print("Db succesfully connected")
+
+    run_ws_server()
     
-    ws_server_thread = Thread(target=run_ws_server, daemon=True)
-    ws_server_thread.start()
 
     run_http_server()
     
