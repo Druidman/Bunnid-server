@@ -1,6 +1,11 @@
 import websockets.sync.server as websockets
+from websockets import ConnectionClosed
 from websockets.sync.server import serve
-from .globals import *
+import server.wsServer.wsComms as comms
+import json
+
+from server.db.tables.userRTSessions import check_if_token_in_db
+import server.globals as globals
 
 
 class Server:
@@ -24,16 +29,34 @@ class Server:
             self.SHUTDOWN = True
             server.server_close()
     
+    def authenticateConnection(self, connection: websockets.ServerConnection) -> bool:
+        connection.send(json.dumps(comms.REQUEST_TOKEN_MSG()))
+        res = connection.recv()
+        msg = json.loads(res)
+        if msg["TYPE"] != comms.REQUEST_TOKEN_MSG_RES_TYPE:
+            return False
         
+        token = msg["MSG"]["TOKEN"]
+        
+        dbRes = check_if_token_in_db(token, globals.dbConn.cursor())
+        if not dbRes["STATUS"]:
+            return False
+        
+        return dbRes["MSG"]
+
 
     def clientHandler(self, connection: websockets.ServerConnection):
         print(f"Client connected!")
         
         try:
+            if self.authenticateConnection(connection):
+                connection.send(json.dumps(comms.ACCES_GRANTED_MSG))
+            else:
+                connection.send(json.dumps(comms.ACCES_DENIED_MSG))
+                
+
             
-            data = connection.recv()
-            connection.send(f"Echo: {data}")
-        except websockets.ConnectionClosed:
+        except ConnectionClosed:
             print("Connection closed dirty")
         finally:
             print("disconnecting...")

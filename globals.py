@@ -5,7 +5,10 @@ API_RESPONSE = lambda stat, msg: {
     "STATUS": stat,
     "MSG": msg
 }
+
+
 USER_TOKEN_LENGTH: int = 15
+RTS_TOKEN_LENGTH: int = 15
 dbConn: sqlite3.Connection | None = None
 
 errors = {
@@ -17,3 +20,5 @@ errors = {
     "LOGIN_TRY_AGAIN": API_RESPONSE(False, "Smth went wrong try loggin in again"),
     "FAILED_TO_ASSIGN_TOKEN": API_RESPONSE(False, "Failed to assign token to the user")
 }
+
+
