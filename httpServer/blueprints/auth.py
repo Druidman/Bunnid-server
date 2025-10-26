@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from ..db.tables.users import check_if_user_exists, add_new_user
+from server.db.tables.users import check_if_user_exists, add_new_user
 from ..auth import make_user_session
 
 from server import globals

@@ -2,7 +2,7 @@ from flask import request
 import secrets
 
 from server import globals
-from ..db.tables.userSessions import check_if_token_in_db, add_token_to_db
+from server.db.tables.userSessions import check_if_token_in_db, add_token_to_db
 
 def check_if_valid_token(token: str) -> bool:
     if (token == ""): return False

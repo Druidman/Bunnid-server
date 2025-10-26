@@ -12,8 +12,9 @@ def main_route():
     return "<h1>Session Bunnid api</h1>"
 
 @session_bp.route("/getRTS", methods=["GET"])
-@userSession
+@userSession # validates userSession (token)
 def get_realtime_session():
+    
     return globals.API_RESPONSE(True, "Work in progress endpoint")
 
 
