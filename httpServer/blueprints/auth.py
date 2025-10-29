@@ -12,10 +12,10 @@ def testRoute():
 
 
 
-@auth_bp.route("/login")
+@auth_bp.route("/login", methods=["POST"])
 def login():
-    login: str | None = request.args.get("login")
-    password: str | None = request.args.get("password")
+    login: str | None = request.json.get("login")
+    password: str | None = request.json.get("password")
     if (not login or not password):
         return globals.API_RESPONSE(False, "Password, name, login not provided")
     
@@ -30,14 +30,14 @@ def login():
 
             return globals.errors("FAILED_TO_ASSIGN_TOKEN")
         else:
-            return globals.API_RESPONSE(True, token)
+            return globals.API_RESPONSE(True, {"token": token})
 
 
-@auth_bp.route("/register", methods=["GET"]) # FIX TO PUT
+@auth_bp.route("/register", methods=["POST"])
 def register():
-    name: str | None = request.args.get("name") 
-    login: str | None = request.args.get("login")
-    password: str | None = request.args.get("password")
+    name: str | None = request.json.get("name")
+    login: str | None = request.json.get("login")
+    password: str | None = request.json.get("password")
     if (not name or not login or not password):
         return globals.API_RESPONSE(False, "Password, name, login not provided")
     
