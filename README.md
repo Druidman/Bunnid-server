@@ -15,3 +15,5 @@ This is server for bunnid web app
 |---> SomeFile<br>
 
 *Then you need to run command in 1st point in `root/` directory*
+
+### `Thanks for stopping by!`
