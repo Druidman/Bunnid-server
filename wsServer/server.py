@@ -54,7 +54,7 @@ class Server:
         if msg["TYPE"] != comms.REQUEST_TOKEN_MSG_RES_TYPE:
             return False
         
-        token = msg["MSG"]["TOKEN"]
+        token = msg["MSG"]
         
         dbRes = check_if_token_in_db(token, globals.dbConn.cursor())
         if not dbRes["STATUS"]:
