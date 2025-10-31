@@ -12,14 +12,14 @@ session_bp = Blueprint("session", __name__)
 def main_route():
     return "<h1>Session Bunnid api</h1>"
 
-@session_bp.route("/getRTS", methods=["GET"])
+@session_bp.route("/getRTS", methods=["POST"])
 @userSession # validates userSession (user session token)
 def get_realtime_session():
     rts_token: str = make_RTS()
     if (not rts_token):
         return globals.errors["FAILED_TO_ASSIGN_TOKEN"]
     
-    return globals.API_RESPONSE(True, rts_token)
+    return globals.API_RESPONSE(True, {"token":rts_token})
 
 
 
