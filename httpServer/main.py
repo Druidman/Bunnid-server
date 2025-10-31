@@ -9,5 +9,6 @@ def run_http_server():
     CORS(app)
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(session_bp, url_prefix="/api/session")
+    app.register_blueprint(docs_bp, url_prefix="/api/docs")
     app.run(host="0.0.0.0", port=5000)
 

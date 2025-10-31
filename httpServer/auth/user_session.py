@@ -26,7 +26,7 @@ def make_user_session() -> str:
 def userSession(func):
     def validate(*args, **kwargs):
         try:
-            token = request.args.get("token")
+            token = request.json.get("token")
             if (token == None):
                 return globals.errors["NO_ARGS"]
         except Exception as e:
