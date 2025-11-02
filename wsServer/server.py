@@ -4,11 +4,13 @@ from websockets.sync.server import serve
 import server.wsServer.wsComms as comms
 import json
 
-from server.db.tables.userRTSessions import check_if_token_in_db
-import server.globals as globals
 
 from threading import Thread
 import time
+
+from server.wsServer.objects.client import Client
+from server.wsServer.objects.wsMessage import WsMessage
+from server.wsServer.objects.wsMessageType import WsMessageType
 
 
 class Server:
@@ -21,15 +23,6 @@ class Server:
 
         self.SHUTDOWN = False
 
-    def getMsg(self,connection: websockets.ServerConnection, timeout = None) -> str | None:
-        while True:
-            try:
-                msg = connection.recv(timeout=timeout)
-            except:
-                return None
-            
-            return msg
-
     
     def run_server(self):
         server = serve(self.clientHandler, host="0.0.0.0", port=self.port)
@@ -41,26 +34,7 @@ class Server:
             self.SHUTDOWN = True
             server.server_close()
     
-    def authenticateConnection(self, connection: websockets.ServerConnection) -> bool:
-        connection.send(json.dumps(comms.REQUEST_TOKEN_MSG()))
-        res = self.getMsg(connection, timeout=10)
-        if not res:
-            return False
-        try:
-            msg = json.loads(res)
-        except:
-            return False
-
-        if msg["TYPE"] != comms.REQUEST_TOKEN_MSG_RES_TYPE:
-            return False
-        
-        token = msg["MSG"]
-        
-        dbRes = check_if_token_in_db(token, globals.dbConn.cursor())
-        if not dbRes["STATUS"]:
-            return False
-        
-        return dbRes["MSG"]
+    
     
     def pingConnection(self,connection: websockets.ServerConnection) -> bool:
         try:
@@ -85,23 +59,20 @@ class Server:
     def clientHandler(self, connection: websockets.ServerConnection):
         print(f"Client connected!")
         
+        
+
+        client = Client(connection)
+
         pinger = self.startClientPinger(connection)
+       
         try:
-            access = False
-            if self.authenticateConnection(connection):
-                connection.send(json.dumps(comms.ACCESS_GRANTED_MSG))
-                access = True
-            else:
-                connection.send(json.dumps(comms.ACCESS_DENIED_MSG))
-                access = False
+            if not client.authenticate(): return #go to finally
+            print("After auth now starting to pool msg'es")
+            client.msgReceiver()
 
-            while access:
-                msg = connection.recv()
-                print(f"MSG: {msg}")
-
-            
         except ConnectionClosed:
             print("Connection closed dirty")
+
         finally:
             
             print("disconnecting...")
