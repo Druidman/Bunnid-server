@@ -84,6 +84,9 @@ class Client:
             return True
         except:
             return False
+        
+
+
 
     def msgReceiver(self):
         self.msgReceiverOn = True
@@ -91,7 +94,8 @@ class Client:
         while not self.end:
             try:
                 msg = self.connection.recv()
-                self.messages.append(json.loads(msg))
+                msg = json.loads(msg)
+                self.messages.append(msg)
             except:
                 break
 

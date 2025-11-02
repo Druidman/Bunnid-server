@@ -8,6 +8,12 @@ class WsMessageType:
 
     ACCESS_GRANTED_MSG_INFO_TYPE = "ACCESS_GRANTED_MSG_INFO_TYPE"
     ACCESS_DENIED_MSG_INFO_TYPE = "ACCESS_DENIED_MSG_INFO_TYPE"
+
+    
+
+    
+
+    
     
 
     

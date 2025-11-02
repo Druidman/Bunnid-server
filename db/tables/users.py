@@ -57,3 +57,11 @@ def get_user_by_login(login: str, db: sqlite3.Cursor) -> dict:
     db.execute("SELECT * FROM Users WHERE login=:login LIMIT 1",{"login": login})
     resRows = db.fetchone()
     return DB_RESULT(True, resRows)
+
+@dbFunction
+def get_users_preview(limit: int, db: sqlite3.Cursor)  -> dict:
+    if limit < 0: return DB_RESULT(False, "Wrong limit")
+
+    db.execute("SELECT name FROM Users")
+    resRows = db.fetchall()
+    return DB_RESULT(True, resRows)
