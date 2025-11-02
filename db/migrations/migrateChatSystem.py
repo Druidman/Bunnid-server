@@ -7,12 +7,13 @@ def migrate_chat_system(db: sqlite3.Cursor) -> dict:
     db.execute("CREATE TABLE IF NOT EXISTS messages(" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT," \
             "conversationId INTEGER," \
-            "receiverId INTEGER," \
+            "userId INTEGER," \
             "content TEXT" \
         ")"
     )
     db.execute("CREATE TABLE IF NOT EXISTS conversations(" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT" \
+            "title TEXT" \
         ")"
     )
     db.execute("CREATE TABLE IF NOT EXISTS conversation_members(" \
