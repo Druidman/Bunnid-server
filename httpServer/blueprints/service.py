@@ -8,6 +8,7 @@ from .services import conversation_bp
 service_bp = Blueprint("service", __name__)
 
 service_bp.register_blueprint(conversation_bp, url_prefix="/conversation")
+service_bp.register_blueprint(conversation_bp, url_prefix="/database")
 
 
 @service_bp.route("/", methods=["GET"])

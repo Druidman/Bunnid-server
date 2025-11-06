@@ -46,7 +46,7 @@ def add_new_user(name: str, login: str, password: str, db: sqlite3.Cursor) -> di
 def get_user_by_name(name: str, db: sqlite3.Cursor)  -> dict:
     if (not name): return DB_RESULT(False, "Wrong name")
 
-    db.execute("SELECT * FROM Users WHERE name=:name LIMIT 1",{"name": name})
+    db.execute("SELECT id, name FROM Users WHERE name=:name LIMIT 1",{"name": name})
     resRows = db.fetchone()
     return DB_RESULT(True, resRows)
 
@@ -54,7 +54,7 @@ def get_user_by_name(name: str, db: sqlite3.Cursor)  -> dict:
 def get_user_by_login(login: str, db: sqlite3.Cursor) -> dict:
     if (not login): return DB_RESULT(False, "Wrong login")
 
-    db.execute("SELECT * FROM Users WHERE login=:login LIMIT 1",{"login": login})
+    db.execute("SELECT id, name FROM Users WHERE login=:login LIMIT 1",{"login": login})
     resRows = db.fetchone()
     return DB_RESULT(True, resRows)
 
@@ -62,6 +62,6 @@ def get_user_by_login(login: str, db: sqlite3.Cursor) -> dict:
 def get_users_preview(limit: int, db: sqlite3.Cursor)  -> dict:
     if limit < 0: return DB_RESULT(False, "Wrong limit")
 
-    db.execute("SELECT name FROM Users LIMIT :limit", {"limit": limit})
+    db.execute("SELECT id, name FROM Users LIMIT :limit", {"limit": limit})
     resRows = db.fetchall()
     return DB_RESULT(True, resRows)

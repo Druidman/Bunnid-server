@@ -1,6 +1,11 @@
 
 import sqlite3
 
+def api_response_from_db_repsonse(result: dict) -> dict:
+    if (not result["STATUS"]):
+        return API_RESPONSE(False, result["msg"])
+    return API_RESPONSE(True, result["msg"])
+
 API_RESPONSE = lambda stat, msg: {
     "STATUS": stat,
     "MSG": msg

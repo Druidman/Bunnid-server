@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from server.httpServer.auth import userSession
 from server.db.tables.conversations import get_conversation, add_conversation
 from server.db.tables.messages import get_messages, add_message
+from server.db.tables.conversation_members import add_member, get_members
 
 from server import globals
 
@@ -10,7 +11,7 @@ conversation_bp = Blueprint("conversation", __name__)
 
 @conversation_bp.route("/", methods=["GET"])
 def conversationMain():
-    return "<h1>This is conversation api! /message, /get</h1>"
+    return "<h1>This is conversation api!</h1>"
 
 
 @conversation_bp.route("/send", methods=["POST"])
@@ -24,11 +25,8 @@ def conversationSendMsg():
         return globals.errors["NO_ARGS"]
     
     result = add_message(convId=conversationId, userId=userId, content=msgContent, db=globals.dbConn.cursor())
-
-    if (not result["STATUS"]):
-        return globals.API_RESPONSE(False, result["MSG"])
-    
-    return globals.API_RESPONSE(True, result["MSG"])
+    return globals.api_response_from_db_repsonse(result)
+  
 
 @conversation_bp.route("/getMessages", methods=["POST"])
 @userSession
@@ -38,12 +36,9 @@ def conversationGetMessages():
     except:
         return globals.errors["NO_ARGS"]
     
-    result = get_messages(convId=conversationId, db=globals.dbConn.cursor())
+    result = get_messages(convId=conversationId, limit=100, db=globals.dbConn.cursor())
 
-    if (not result["STATUS"]):
-        return globals.API_RESPONSE(False, result["MSG"])
-    
-    return globals.API_RESPONSE(True, result["MSG"])
+    return globals.api_response_from_db_repsonse(result)
 
 
 @conversation_bp.route("/create", methods=["POST"])
@@ -56,10 +51,33 @@ def conversationCreate():
     
     result = add_conversation(title=conversationTitle, db=globals.dbConn.cursor())
 
-    if (not result["STATUS"]):
-        return globals.API_RESPONSE(False, result["MSG"])
+    return globals.api_response_from_db_repsonse(result)
+
+
+@conversation_bp.route("/addMember", methods=["POST"])
+@userSession
+def conversationAddMember():
+    try:
+        conversationId = request.json.get("conversationId")
+        memberId = request.json.get("memberId")
+    except:
+        return globals.errors["NO_ARGS"]
     
-    return globals.API_RESPONSE(True, result["MSG"])
+    result = add_member(convId=conversationId, userId=memberId, db=globals.dbConn.cursor())
+
+    return globals.api_response_from_db_repsonse(result)
+
+@conversation_bp.route("/getMembers", methods=["POST"])
+@userSession
+def conversationAddMember():
+    try:
+        conversationId = request.json.get("conversationId")
+    except:
+        return globals.errors["NO_ARGS"]
+    
+    result = get_members(convId=conversationId, db=globals.dbConn.cursor())
+
+    return globals.api_response_from_db_repsonse(result)
     
 @conversation_bp.route("/get", methods=["POST"])
 @userSession
@@ -69,12 +87,9 @@ def conversationGet():
     except:
         return globals.errors["NO_ARGS"]
     
-    conversation = get_conversation(convId=conversationId, db=globals.dbConn.cursor())
+    result = get_conversation(convId=conversationId, db=globals.dbConn.cursor())
 
-    if (not conversation["STATUS"]):
-        return globals.API_RESPONSE(False, conversation["MSG"])
-    
-    return globals.API_RESPONSE(True, conversation["MSG"])
+    return globals.api_response_from_db_repsonse(result)
 
 
     
