@@ -15,6 +15,20 @@ def get_conversation(convId: int, db: sqlite3.Cursor) -> dict:
     return DB_RESULT(True, rows)
 
 @dbFunction
+def get_conversations(limit: int, db: sqlite3.Cursor) -> dict:
+    if (limit <= 0):
+        return DB_RESULT(False, "wrong limit")
+    
+    db.execute("SELECT title, id FROM conversations WHERE LIMIT :limit", {
+        "limit": limit
+    })
+    rows = db.fetchall()
+    if (not rows):
+        return DB_RESULT(False, "No conversations")
+    return DB_RESULT(True, rows)
+
+
+@dbFunction
 def get_conversation_by_title(title: str, db: sqlite3.Cursor) -> dict:
     if (title == ""):
         return DB_RESULT(False, "wrong conv ntitleame")

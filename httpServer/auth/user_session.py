@@ -24,7 +24,7 @@ def make_user_session() -> str:
 
 
 def userSession(func):
-    def validate(*args, **kwargs):
+    def validateToken(*args, **kwargs):
         try:
             token = request.json.get("token")
             if (token == None):
@@ -39,4 +39,6 @@ def userSession(func):
         
         result = func()
         return result
-    return validate
+    
+    validateToken.__name__ = func.__name__
+    return validateToken

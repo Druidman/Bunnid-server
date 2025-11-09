@@ -1,6 +1,6 @@
 from flask import Blueprint, request
-from server.httpServer.auth import userSession
-from server.db.tables.conversations import get_conversation, add_conversation
+from server.httpServer.auth.user_session import userSession
+from server.db.tables.conversations import get_conversation, add_conversation, get_conversations
 from server.db.tables.messages import get_messages, add_message
 from server.db.tables.conversation_members import add_member, get_members
 
@@ -69,7 +69,7 @@ def conversationAddMember():
 
 @conversation_bp.route("/getMembers", methods=["POST"])
 @userSession
-def conversationAddMember():
+def conversationGetMembers():
     try:
         conversationId = request.json.get("conversationId")
     except:
@@ -88,6 +88,15 @@ def conversationGet():
         return globals.errors["NO_ARGS"]
     
     result = get_conversation(convId=conversationId, db=globals.dbConn.cursor())
+
+    return globals.api_response_from_db_repsonse(result)
+
+
+@conversation_bp.route("/list", methods=["POST"])
+@userSession
+def conversationGet():
+    
+    result = get_conversations(limit=100, db=globals.dbConn.cursor())
 
     return globals.api_response_from_db_repsonse(result)
 
