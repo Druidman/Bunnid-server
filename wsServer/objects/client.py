@@ -7,7 +7,8 @@ import time, json
 
 from server.db.tables.userRTSessions import check_if_token_in_db
 import server.globals as globals
-
+from server.db.utils import DbResult
+ 
 class Client:
     def __init__(self, connection: websockets.ServerConnection):
         self.connection = connection
@@ -50,8 +51,8 @@ class Client:
         
         token = msg["MSG"]
         
-        dbRes = check_if_token_in_db(token, globals.dbConn.cursor())
-        if not dbRes["STATUS"]:
+        dbRes: DbResult = check_if_token_in_db(token, globals.dbConn.cursor())
+        if not dbRes.status:
             self.sendMsg(accessDenied)
             return False
         
