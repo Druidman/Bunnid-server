@@ -1,20 +1,20 @@
 import sqlite3
-from ..utils import DB_RESULT, dbFunction
+from ..utils import DbResult, dbFunction
 
 @dbFunction
-def check_if_token_in_db(token: str, db: sqlite3.Cursor) -> dict:
+def check_if_token_in_db(token: str, db: sqlite3.Cursor) -> DbResult:
     
     db.execute("SELECT id FROM UserRTSessions WHERE token=:token LIMIT 1",{"token": token})
     if (db.fetchone()):
-        return DB_RESULT(True, True)
+        return DbResult(True, True)
     else:
-        return DB_RESULT(True, False) 
+        return DbResult(True, False) 
    
 @dbFunction
-def add_token_to_db(token: str, db: sqlite3.Cursor) -> dict:
+def add_token_to_db(token: str, db: sqlite3.Cursor) -> DbResult:
     db.execute("INSERT INTO UserRTSessions(token) VALUES(:token)",{"token": token})
     db.connection.commit()
-    return DB_RESULT(True, True)
+    return DbResult(True, True)
 
 
     
