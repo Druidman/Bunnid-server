@@ -1,5 +1,6 @@
 from flask import Blueprint, request
-from server.db.tables.users import check_if_user_exists, add_new_user
+from server.db.tables.users import check_if_user_exists, add_new_user, get_user_by_login
+from server.db.tables.userSessions import get_token_data
 from ..auth import make_user_session
 
 from server import globals
@@ -25,12 +26,23 @@ def login():
     else:
         if (not res["MSG"]):
             return globals.errors["INCORRECT_LOGIN_VALUES"]
+        
+        userRes = get_user_by_login(login, globals.dbConn.cursor())
+        if (not userRes["STATUS"]):
+            return globals.errors["LOGIN_TRY_AGAIN"]
+
+        userId = userRes["MSG"]["id"]
+        
+
         token = make_user_session()
         if not token:
 
             return globals.errors("FAILED_TO_ASSIGN_TOKEN")
         else:
-            return globals.API_RESPONSE(True, {"token": token})
+            tokenRes = get_token_data(token, globals.dbConn.cursor())
+            if (not tokenRes["STATUS"]):
+                return globals.errors("FAILED_TO_ASSIGN_TOKEN")
+            return globals.API_RESPONSE(True, {"token": token, "userId": tokenRes["userId"]})
 
 
 @auth_bp.route("/register", methods=["POST"])

@@ -7,6 +7,7 @@ def migrate_user_sessions(db: sqlite3.Cursor) -> dict:
     db.execute("CREATE TABLE IF NOT EXISTS UserSessions(" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT," \
             "token TEXT," \
+            "userId INTEGER," \
             "unique(token)" \
         ")"
     )

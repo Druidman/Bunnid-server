@@ -94,7 +94,7 @@ def conversationGet():
 
 @conversation_bp.route("/list", methods=["POST"])
 @userSession
-def conversationGet():
+def conversationList():
     
     result = get_conversations(limit=100, db=globals.dbConn.cursor())
 
