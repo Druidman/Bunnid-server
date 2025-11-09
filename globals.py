@@ -1,10 +1,13 @@
 
 import sqlite3
+from server.db.utils import DbResult
 
-def api_response_from_db_repsonse(result: dict) -> dict:
-    if (not result["STATUS"]):
-        return API_RESPONSE(False, result["msg"])
-    return API_RESPONSE(True, result["msg"])
+def api_response_from_db_repsonse(result: DbResult) -> dict:
+    if result.makeMsgDict():
+        return API_RESPONSE(result.status, result.msgDict)
+    else:
+        return API_RESPONSE(result.status, result.msg)
+    
 
 API_RESPONSE = lambda stat, msg: {
     "STATUS": stat,

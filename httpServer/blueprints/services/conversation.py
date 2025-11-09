@@ -5,6 +5,7 @@ from server.db.tables.messages import get_messages, add_message
 from server.db.tables.conversation_members import add_member, get_members
 
 from server import globals
+from server.db.utils import DbResult
 
 conversation_bp = Blueprint("conversation", __name__)
 
@@ -96,8 +97,7 @@ def conversationGet():
 @userSession
 def conversationList():
     
-    result = get_conversations(limit=100, db=globals.dbConn.cursor())
-
+    result: DbResult = get_conversations(limit=100, db=globals.dbConn.cursor())
     return globals.api_response_from_db_repsonse(result)
 
 

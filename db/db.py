@@ -4,6 +4,7 @@ from .migrations import migrate
 
 def connectDb() -> sqlite3.Connection | None:
     dbConn = sqlite3.connect("database.db", check_same_thread=False)
+    dbConn.row_factory = sqlite3.Row
     
     if (migrate(dbConn=dbConn)):
         return dbConn

@@ -23,15 +23,15 @@ def add_new_user(name: str, login: str, password: str, db: sqlite3.Cursor) -> Db
     if (not name or not login or not password): return DbResult(False, "Wrong name or password or login")
 
     #check if exists
-    nameResult = get_user_by_name(name, db)
-    loginResult = get_user_by_login(login, db)
-    if (not nameResult["STATUS"] or not loginResult["STATUS"]):
-        return DbResult(False, f'NAME: {nameResult["MSG"]} LOGIN: {loginResult["MSG"]}')
+    nameResult: DbResult = get_user_by_name(name, db)
+    loginResult: DbResult = get_user_by_login(login, db)
+    if (not nameResult.status or not loginResult.status):
+        return DbResult(False, f'NAME: {nameResult.msg} LOGIN: {loginResult.msg}')
     
-    if (nameResult["MSG"]):
+    if (nameResult.msg):
         return DbResult(False, f"Account of this name already exists")
     
-    if (loginResult["MSG"]):
+    if (loginResult.msg):
         return DbResult(False, f"Account of this login already exists")
 
     db.execute("INSERT INTO Users(name, login, password) VALUES(:name, :login, :password)", {
@@ -48,7 +48,7 @@ def get_user_by_name(name: str, db: sqlite3.Cursor)  -> DbResult:
 
     db.execute("SELECT id, name FROM Users WHERE name=:name LIMIT 1",{"name": name})
     resRows = db.fetchone()
-    return DbResult(True, resRows)
+    return DbResult(True, resRows, True)
 
 @dbFunction
 def get_user_by_login(login: str, db: sqlite3.Cursor) -> DbResult:
@@ -56,7 +56,7 @@ def get_user_by_login(login: str, db: sqlite3.Cursor) -> DbResult:
 
     db.execute("SELECT id, name FROM Users WHERE login=:login LIMIT 1",{"login": login})
     resRows = db.fetchone()
-    return DbResult(True, resRows)
+    return DbResult(True, resRows, True)
 
 @dbFunction
 def get_users_preview(limit: int, db: sqlite3.Cursor)  -> DbResult:
@@ -64,4 +64,4 @@ def get_users_preview(limit: int, db: sqlite3.Cursor)  -> DbResult:
 
     db.execute("SELECT id, name FROM Users LIMIT :limit", {"limit": limit})
     resRows = db.fetchall()
-    return DbResult(True, resRows)
+    return DbResult(True, resRows, True)

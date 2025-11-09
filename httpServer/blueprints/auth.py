@@ -4,6 +4,7 @@ from server.db.tables.userSessions import get_token_data
 from ..auth import make_user_session
 
 from server import globals
+from server.db.utils import DbResult
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -20,29 +21,29 @@ def login():
     if (not login or not password):
         return globals.API_RESPONSE(False, "Password, name, login not provided")
     
-    res = check_if_user_exists( login, password, globals.dbConn.cursor())
-    if (not res["STATUS"]):
+    res: DbResult = check_if_user_exists( login, password, globals.dbConn.cursor())
+    if (not res.status):
         return globals.errors["LOGIN_TRY_AGAIN"]
     else:
-        if (not res["MSG"]):
+        if (not res.msg):
             return globals.errors["INCORRECT_LOGIN_VALUES"]
         
         userRes = get_user_by_login(login, globals.dbConn.cursor())
-        if (not userRes["STATUS"]):
+        if (not userRes.status):
             return globals.errors["LOGIN_TRY_AGAIN"]
-
-        userId = userRes["MSG"]["id"]
+      
+        userId = userRes.msg["id"]
         
 
-        token = make_user_session()
+        token = make_user_session(userId)
         if not token:
 
-            return globals.errors("FAILED_TO_ASSIGN_TOKEN")
+            return globals.errors["FAILED_TO_ASSIGN_TOKEN"]
         else:
-            tokenRes = get_token_data(token, globals.dbConn.cursor())
-            if (not tokenRes["STATUS"]):
-                return globals.errors("FAILED_TO_ASSIGN_TOKEN")
-            return globals.API_RESPONSE(True, {"token": token, "userId": tokenRes["userId"]})
+            return globals.API_RESPONSE(True, {
+                "token": token, 
+                "userId": userId
+            })
 
 
 @auth_bp.route("/register", methods=["POST"])
@@ -55,6 +56,6 @@ def register():
     
     res = add_new_user(name, login, password, globals.dbConn.cursor())
     
-    return globals.API_RESPONSE(res["STATUS"], res["MSG"])
+    return globals.API_RESPONSE(res.status, res.msg)
 
 

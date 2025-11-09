@@ -30,7 +30,7 @@ def get_token_data(token: str, db: sqlite3.Cursor) -> DbResult:
     print(row)
     if not row:
         return DbResult(False, "")
-    return DbResult(True, row)
+    return DbResult(True, row, True)
 
 
     

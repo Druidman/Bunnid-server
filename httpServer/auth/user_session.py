@@ -3,21 +3,22 @@ import secrets
 
 from server import globals
 from server.db.tables.userSessions import check_if_token_in_db, add_token_to_db
+from server.db.utils import DbResult
 
 def check_if_valid_token(token: str) -> bool:
     if (token == ""): return False
     if (len(token) < globals.USER_TOKEN_LENGTH): return False
 
-    result = check_if_token_in_db(token, globals.dbConn.cursor())
-    if not result["STATUS"]:
+    result: DbResult = check_if_token_in_db(token, globals.dbConn.cursor())
+    if not result.status:
         return False
-    return result["MSG"]
+    return result.msg
 
 def make_user_session(userId: str) -> str:
     token: str = secrets.token_urlsafe(globals.USER_TOKEN_LENGTH)
-    result = add_token_to_db(token=token, userId=userId, db=globals.dbConn.cursor())
-    if not result["STATUS"]:
-        print(f"Error when adding token: {result['MSG']}")
+    result: DbResult = add_token_to_db(token=token, userId=userId, db=globals.dbConn.cursor())
+    if not result.status:
+        print(f"Error when adding token: {result.msg}")
         return ""
     else:
         return token

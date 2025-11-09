@@ -12,7 +12,7 @@ def get_conversation(convId: int, db: sqlite3.Cursor) -> DbResult:
     rows = db.fetchone()
     if (not rows):
         return DbResult(False, "No such conversation")
-    return DbResult(True, rows)
+    return DbResult(True, rows, True)
 
 @dbFunction
 def get_conversations(limit: int, db: sqlite3.Cursor) -> DbResult:
@@ -25,7 +25,7 @@ def get_conversations(limit: int, db: sqlite3.Cursor) -> DbResult:
     rows = db.fetchall()
     if (not rows):
         return DbResult(False, "No conversations")
-    return DbResult(True, rows)
+    return DbResult(True, rows, True)
 
 
 @dbFunction
@@ -37,7 +37,7 @@ def get_conversation_by_title(title: str, db: sqlite3.Cursor) -> DbResult:
         "title": title
     })
     rows = db.fetchone()
-    return DbResult(True, rows)
+    return DbResult(True, rows, True)
 
 
 @dbFunction

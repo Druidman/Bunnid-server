@@ -10,7 +10,7 @@ def get_members(convId: int, db: sqlite3.Cursor) -> DbResult:
         "convId": convId
     })
     rows = db.fetchall()
-    return DbResult(True, rows)
+    return DbResult(True, rows, True)
 
 
 @dbFunction

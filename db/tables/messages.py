@@ -11,7 +11,7 @@ def get_messages(convId: int, limit: int, db: sqlite3.Cursor) -> DbResult:
         "limit": limit
     })
     rows = db.fetchall()
-    return DbResult(True, rows)
+    return DbResult(True, rows, True)
 
 
 @dbFunction
