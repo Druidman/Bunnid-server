@@ -1,8 +1,8 @@
 import sqlite3
-from ..utils import DB_RESULT, dbFunction
+from ..utils import DbResult, dbFunction
 
 @dbFunction
-def migrate_user_sessions(db: sqlite3.Cursor) -> dict:
+def migrate_user_sessions(db: sqlite3.Cursor) -> DbResult:
     
     db.execute("CREATE TABLE IF NOT EXISTS UserSessions(" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT," \
@@ -12,6 +12,6 @@ def migrate_user_sessions(db: sqlite3.Cursor) -> dict:
         ")"
     )
     db.connection.commit()
-    return DB_RESULT(True, True)
+    return DbResult(True, True)
     
     

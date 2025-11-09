@@ -1,8 +1,8 @@
 import sqlite3
-from ..utils import DB_RESULT, dbFunction
+from ..utils import DbResult, dbFunction
 
 @dbFunction
-def migrate_users(db: sqlite3.Cursor) -> dict:
+def migrate_users(db: sqlite3.Cursor) -> DbResult:
     db.execute("CREATE TABLE IF NOT EXISTS Users(" \
             "id INTEGER PRIMARY KEY AUTOINCREMENT," \
             "name TEXT," \
@@ -13,6 +13,6 @@ def migrate_users(db: sqlite3.Cursor) -> dict:
         ")"
     )
     db.connection.commit()
-    return DB_RESULT(True, True)
+    return DbResult(True, True)
     
     
