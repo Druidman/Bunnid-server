@@ -19,7 +19,7 @@ def get_conversations(limit: int, db: sqlite3.Cursor) -> DbResult:
     if (limit <= 0):
         return DbResult(False, "wrong limit")
     
-    db.execute("SELECT title, id FROM conversations WHERE LIMIT :limit", {
+    db.execute("SELECT title, id FROM conversations LIMIT :limit", {
         "limit": limit
     })
     rows = db.fetchall()
@@ -31,7 +31,7 @@ def get_conversations(limit: int, db: sqlite3.Cursor) -> DbResult:
 @dbFunction
 def get_conversation_by_title(title: str, db: sqlite3.Cursor) -> DbResult:
     if (title == ""):
-        return DbResult(False, "wrong conv ntitleame")
+        return DbResult(False, "wrong conv title")
     
     db.execute("SELECT conversationId FROM conversations WHERE title=:title", {
         "title": title

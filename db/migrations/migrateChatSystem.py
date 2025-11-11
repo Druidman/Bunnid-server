@@ -11,11 +11,15 @@ def migrate_chat_system(db: sqlite3.Cursor) -> DbResult:
             "content TEXT" \
         ")"
     )
+    db.connection.commit()
+
     db.execute("CREATE TABLE IF NOT EXISTS conversations(" \
-            "id INTEGER PRIMARY KEY AUTOINCREMENT" \
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," \
             "title TEXT" \
         ")"
     )
+    db.connection.commit()
+
     db.execute("CREATE TABLE IF NOT EXISTS conversation_members(" \
             "conversationId INTEGER PRIMARY KEY AUTOINCREMENT," \
             "userId INTEGER" \
