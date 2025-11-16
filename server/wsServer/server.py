@@ -1,5 +1,6 @@
 import websockets.sync.server as websockets
-from websockets import ConnectionClosed, InvalidHandshake, InvalidMessage
+
+from websockets.exceptions import InvalidHandshake, ConnectionClosed, InvalidMessage
 from websockets.sync.server import serve
 import server.wsServer.wsComms as comms
 import json
@@ -7,6 +8,7 @@ import json
 
 from threading import Thread
 import time
+import http
 
 from server.wsServer.objects.client import Client
 from server.wsServer.objects.wsMessage import WsMessage
@@ -23,9 +25,12 @@ class Server:
 
         self.SHUTDOWN = False
 
+    def health_check(self,connection, request):
+        if request.path == "/healthz":
+            return connection.respond(http.HTTPStatus.OK, "OK\n")
     
     def run_server(self):
-        server = serve(self.clientHandler, host="0.0.0.0", port=self.port)
+        server = serve(self.clientHandler, host="0.0.0.0", port=self.port, process_request=self.health_check)
         try:
             
             print(f"Server started... on port {self.port}")
