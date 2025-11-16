@@ -7,6 +7,10 @@ from .blueprints import *
 def run_http_server():
     app = Flask(__name__)
     CORS(app)
+    @app.route("/healthz", methods=["GET", "HEAD"])
+    def health():
+        return "OK", 200
+    
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(session_bp, url_prefix="/api/session")
     app.register_blueprint(docs_bp, url_prefix="/api/docs")
