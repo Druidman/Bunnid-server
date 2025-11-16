@@ -25,9 +25,8 @@ class Server:
 
         self.SHUTDOWN = False
 
-    def health_check(self, path, request_headers):
-        if path == "/healthz":
-            return http.HTTPStatus.OK, [], b"OK\n"
+    def health_check(self, connection: websockets.ServerConnection, request):
+        return None
     
     def run_server(self):
         server = serve(self.clientHandler, host=self.host, port=self.port, process_request=self.health_check)
