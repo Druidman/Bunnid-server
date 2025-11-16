@@ -30,7 +30,7 @@ class Server:
             return connection.respond(http.HTTPStatus.OK, "OK\n")
     
     def run_server(self):
-        server = serve(self.clientHandler, host="0.0.0.0", port=self.port, process_request=self.health_check)
+        server = serve(self.clientHandler, host=self.host, port=self.port, process_request=self.health_check)
         try:
             
             print(f"Server started... on port {self.port}")
