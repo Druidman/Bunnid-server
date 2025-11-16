@@ -1,5 +1,5 @@
 import websockets.sync.server as websockets
-from websockets import ConnectionClosed, InvalidHandshake
+from websockets import ConnectionClosed, InvalidHandshake, InvalidMessage
 from websockets.sync.server import serve
 import server.wsServer.wsComms as comms
 import json
@@ -73,6 +73,7 @@ class Server:
         except ConnectionClosed:
             print("Connection closed dirty")
         except InvalidHandshake: pass
+        except InvalidMessage: pass
 
         finally:
             
