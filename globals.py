@@ -3,6 +3,8 @@ import sqlite3
 from server.db.utils import DbResult
 
 def api_response_from_db_repsonse(result: DbResult) -> dict:
+    print(f"DICT: {result.msgDict}")
+    print(f"MSG: {result.msg}")
     if result.makeMsgDict():
         return API_RESPONSE(result.status, result.msgDict)
     else:

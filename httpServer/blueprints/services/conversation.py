@@ -33,7 +33,7 @@ def conversationSendMsg():
 @userSession
 def conversationGetMessages():
     try:
-        conversationId = request.json.get("conversationId")
+        conversationId: int = request.json.get("conversationId")
     except:
         return globals.errors["NO_ARGS"]
     

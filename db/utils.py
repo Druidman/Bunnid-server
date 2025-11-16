@@ -1,4 +1,5 @@
 import sqlite3
+from typing import List
 
 class DbResult:
     status: bool = False
@@ -12,7 +13,18 @@ class DbResult:
 
     def makeMsgDict(self) -> bool:
         if not self.msgAsDbRowObject: return False
-        self.msgDict = [dict(x) for x in self.msg]
+        if not self.msg: return False
+        
+        if type(self.msg) == sqlite3.Row:
+            self.msgDict = dict(self.msg)
+            print(f"reulat {self.msgDict}")
+        elif type(self.msg) == list and type(self.msg[0]) == sqlite3.Row:
+
+            self.msgDict = [dict(x) for x in self.msg]
+            print(f"list {self.msgDict}")
+        else:
+            return False
+        
         return True
 
 

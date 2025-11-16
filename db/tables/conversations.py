@@ -6,7 +6,7 @@ def get_conversation(convId: int, db: sqlite3.Cursor) -> DbResult:
     if (convId <= -1):
         return DbResult(False, "wrong convId")
     
-    db.execute("SELECT title, id FROM conversations WHERE conversationId=:convId LIMIT 1", {
+    db.execute("SELECT title, id FROM conversations WHERE id=:convId LIMIT 1", {
         "convId": convId
     })
     rows = db.fetchone()
@@ -25,6 +25,8 @@ def get_conversations(limit: int, db: sqlite3.Cursor) -> DbResult:
     rows = db.fetchall()
     if (not rows):
         return DbResult(False, "No conversations")
+    
+    print(type(rows))
     return DbResult(True, rows, True)
 
 
@@ -33,7 +35,7 @@ def get_conversation_by_title(title: str, db: sqlite3.Cursor) -> DbResult:
     if (title == ""):
         return DbResult(False, "wrong conv title")
     
-    db.execute("SELECT conversationId FROM conversations WHERE title=:title", {
+    db.execute("SELECT id FROM conversations WHERE title=:title", {
         "title": title
     })
     rows = db.fetchone()
