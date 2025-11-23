@@ -1,19 +1,19 @@
 from server.httpServer import run_http_server
 from server.wsServer import run_ws_server
-from server import globals
-from server.db import connectDb
+import server.globals as globals
+from server.db import setup_db
+from server.eventPool import setupEventPool
+from server.eventPool.EventType import EventType
 
 
 
 if __name__ == "__main__":
-    globals.dbConn = connectDb()
-    if not globals.dbConn:
-        print("Error when connecting to db!")
-        exit()
-    print("Db succesfully connected")
-
-    run_ws_server()
+    setup_db() # connects db
     
+    setupEventPool() # setup events
+    globals.eventPool.notify_event(eventType=EventType.NEW_MSG_IN_CONVERSATION, additionalEventInfo=1) # for tests
 
-    run_http_server()
+    run_ws_server() # run websocket RT server
+    
+    run_http_server() # run bunnid api
     

@@ -1,5 +1,5 @@
 import json
-from server.wsServer.objects.wsMessageType import WsMessageType
+from .wsMessageType import WsMessageType
 
 
 class WsMessage:

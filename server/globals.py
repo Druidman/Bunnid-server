@@ -1,6 +1,8 @@
 
 import sqlite3
 from server.db.utils import DbResult
+from server.eventPool.EventPool import EventPool
+from server.eventPool.events.ConversationMsgEvent import ConversationMsgEvent
 
 def api_response_from_db_repsonse(result: DbResult) -> dict:
     print(f"DICT: {result.msgDict}")
@@ -20,6 +22,9 @@ API_RESPONSE = lambda stat, msg: {
 USER_TOKEN_LENGTH: int = 15
 RTS_TOKEN_LENGTH: int = 15
 dbConn: sqlite3.Connection | None = None
+eventPool: EventPool = None
+conversation_msg_event: ConversationMsgEvent = None
+
 
 errors = {
 

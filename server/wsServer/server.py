@@ -2,17 +2,16 @@ import websockets.sync.server as websockets
 
 from websockets.exceptions import InvalidHandshake, ConnectionClosed, InvalidMessage
 from websockets.sync.server import serve
-import server.wsServer.wsComms as comms
-import json
+
+import server.globals as globals
 
 
 from threading import Thread
 import time
-import http
 
 from server.wsServer.objects.client import Client
-from server.wsServer.objects.wsMessage import WsMessage
-from server.wsServer.objects.wsMessageType import WsMessageType
+
+from server.eventPool.EventType import EventType
 
 
 class Server:
@@ -72,6 +71,7 @@ class Server:
         try:
             if not client.authenticate(): return #go to finally
             print("After auth now starting to pool msg'es")
+            
             client.msgReceiver()
 
         except ConnectionClosed:
