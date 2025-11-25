@@ -8,7 +8,7 @@ import server.globals as globals
 
 from threading import Thread
 import time
-
+import http
 from server.wsServer.objects.client import Client
 
 from server.eventPool.EventType import EventType
@@ -25,8 +25,9 @@ class Server:
         self.SHUTDOWN = False
 
     def health_check(self, connection: websockets.ServerConnection, request):
+        if request.path == "/healthz":
+            return connection.respond(http.HTTPStatus.OK, "OK\n")
         return None
-    
     def run_server(self):
         server = serve(self.clientHandler, host=self.host, port=self.port, process_request=self.health_check)
         try:
