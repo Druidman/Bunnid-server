@@ -3,8 +3,10 @@ from server.httpServer.auth.user_session import userSession
 from server.db.tables.conversations import get_conversation, add_conversation, get_conversations
 from server.db.tables.messages import get_messages, add_message
 from server.db.tables.conversation_members import add_member, get_members
+from server.eventPool.EventType import EventType
+from server.eventPool.events.ConversationMsgEvent import ConversationMsgEventData
 
-from server import globals
+import server.globals as globals
 from server.db.utils import DbResult
 
 conversation_bp = Blueprint("conversation", __name__)
@@ -24,8 +26,9 @@ def conversationSendMsg():
         userId = request.json.get("userId")
     except:
         return globals.errors["NO_ARGS"]
-    
-    result = add_message(convId=conversationId, userId=userId, content=msgContent, db=globals.dbConn.cursor())
+    cur = globals.dbConn.cursor()
+    result: DbResult = add_message(convId=conversationId, userId=userId, content=msgContent, db=cur)
+    globals.eventPool.notify_event(EventType.NEW_MSG_IN_CONVERSATION, ConversationMsgEventData(conversationId, cur.lastrowid))
     return globals.api_response_from_db_repsonse(result)
   
 

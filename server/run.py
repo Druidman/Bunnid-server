@@ -11,7 +11,6 @@ if __name__ == "__main__":
     setup_db() # connects db
     
     setupEventPool() # setup events
-    globals.eventPool.notify_event(eventType=EventType.NEW_MSG_IN_CONVERSATION, additionalEventInfo=1) # for tests
 
     run_ws_server() # run websocket RT server
     

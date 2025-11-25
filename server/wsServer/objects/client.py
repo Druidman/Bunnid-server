@@ -6,6 +6,7 @@ from typing import List
 import time, json
 
 from server.db.tables.userRTSessions import check_if_token_in_db
+from server.db.tables.messages import get_message
 import server.globals as globals
 from server.db.utils import DbResult
 
@@ -90,15 +91,24 @@ class Client:
         except:
             return False
     
-    def sendNewConversationMsg(self, conversationId: int) -> None: 
+    def sendNewConversationMsg(self,messageId: int) -> None: 
         # TODO
-        print(f"sending new conversation msg TODO ID: {conversationId}")
+        print(f"sending new conversation msg TODO ID: {messageId}")
+        messageRes: DbResult = get_message(messageId, globals.dbConn.cursor())
+        if not messageRes.status:
+            return
+        
+        if messageRes.makeMsgDict():
+            self.sendMsg(WsMessage(WsMessageType.NEW_CONVERSATION_MSG__DATA, True, messageRes.msgDict))
+        
+
+
         
 
 
 
     def registerNewConversationMsgEventListener(self, conversationId: int) -> None:
-        listener: ConversationMsgEventListener = ConversationMsgEventListener(self.sendNewConversationMsg, conversationId=conversationId)
+        listener: ConversationMsgEventListener = ConversationMsgEventListener(self.sendNewConversationMsg, conversationId=int(conversationId))
         globals.conversation_msg_event.add_listener(listener)
         self.eventSenders.append(listener)
 

@@ -15,6 +15,19 @@ def get_messages(convId: int, limit: int, db: sqlite3.Cursor) -> DbResult:
 
 
 @dbFunction
+def get_message(messageId: int, db: sqlite3.Cursor) -> DbResult:
+    if (messageId <= -1):
+        return DbResult(False, "wrong value messageId")
+    
+    db.execute("SELECT userId, content, conversationId FROM messages WHERE id=:messageId", {
+        "messageId": messageId
+    })
+    rows = db.fetchone()
+    return DbResult(True, rows, True)
+
+
+
+@dbFunction
 def add_message(convId: int, userId: int, content: str, db: sqlite3.Cursor) -> DbResult:
     if (userId <= -1 or convId <= -1 or content==""):
         return DbResult(False, "wrong values for userId or content or convId")
