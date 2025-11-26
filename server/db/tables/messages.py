@@ -1,41 +1,41 @@
-import sqlite3
+import asyncpg
 from ..utils import DbResult, dbFunction
 
 @dbFunction
-def get_messages(convId: int, limit: int, db: sqlite3.Cursor) -> DbResult:
+async def get_messages(convId: int, limit: int, connPool: asyncpg.Pool) -> DbResult:
     if (limit < -1 or convId <= -1):
         return DbResult(False, "wrong values for limit and convId")
+    async with connPool.acquire() as conn:
+        rows = await conn.execute("SELECT userId, content FROM messages WHERE conversationId=:convId LIMIT :limit", {
+            "convId": convId,
+            "limit": limit
+        })
     
-    db.execute("SELECT userId, content FROM messages WHERE conversationId=:convId LIMIT :limit", {
-        "convId": convId,
-        "limit": limit
-    })
-    rows = db.fetchall()
     return DbResult(True, rows, True)
 
 
 @dbFunction
-def get_message(messageId: int, db: sqlite3.Cursor) -> DbResult:
+async def get_message(messageId: int, connPool: asyncpg.Pool) -> DbResult:
     if (messageId <= -1):
         return DbResult(False, "wrong value messageId")
+    async with connPool.acquire() as conn:
+        row = await conn.fetchrow("SELECT userId, content, conversationId FROM messages WHERE id=:messageId", {
+            "messageId": messageId
+        })
     
-    db.execute("SELECT userId, content, conversationId FROM messages WHERE id=:messageId", {
-        "messageId": messageId
-    })
-    rows = db.fetchone()
-    return DbResult(True, rows, True)
+    return DbResult(True, row, True)
 
 
 
 @dbFunction
-def add_message(convId: int, userId: int, content: str, db: sqlite3.Cursor) -> DbResult:
+async def add_message(convId: int, userId: int, content: str, connPool: asyncpg.Pool) -> DbResult:
     if (userId <= -1 or convId <= -1 or content==""):
         return DbResult(False, "wrong values for userId or content or convId")
+    async with connPool.acquire() as conn:
+        conn.execute("INSERT INTO messages(conversationId, userId, content) VALUES(:convId, :userId, :content)", {
+            "convId": convId,
+            "userId": userId,
+            "content": content
+        })
     
-    db.execute("INSERT INTO messages(conversationId, userId, content) VALUES(:convId, :userId, :content)", {
-        "convId": convId,
-        "userId": userId,
-        "content": content
-    })
-    db.connection.commit()
     return DbResult(True, True)

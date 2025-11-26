@@ -1,12 +1,14 @@
-import sqlite3
+import asyncpg
+import asyncio
+from functools import wraps
 from typing import List
 
 class DbResult:
     status: bool = False
-    msg = None
+    msg: List[asyncpg.Record] | asyncpg.Record | str = None
     msgAsDbRowObject: bool = False
     msgDict = []
-    def __init__(self, status: bool, msg, msgAsDbRowObject = False):
+    def __init__(self, status: bool, msg: List[asyncpg.Record] | asyncpg.Record | str, msgAsDbRowObject = False):
         self.status = status
         self.msg = msg
         self.msgAsDbRowObject = msgAsDbRowObject
@@ -15,10 +17,10 @@ class DbResult:
         if not self.msgAsDbRowObject: return False
         if not self.msg: return False
         
-        if type(self.msg) == sqlite3.Row:
+        if type(self.msg) == asyncpg.Record:
             self.msgDict = dict(self.msg)
             print(f"reulat {self.msgDict}")
-        elif type(self.msg) == list and type(self.msg[0]) == sqlite3.Row:
+        elif type(self.msg) == list and type(self.msg[0]) == asyncpg.Record:
 
             self.msgDict = [dict(x) for x in self.msg]
             print(f"list {self.msgDict}")
@@ -33,9 +35,19 @@ class DbResult:
 
 
 def dbFunction(func) -> DbResult:
-    def logic(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except sqlite3.Error as e:
-            return DbResult(False, e)
-    return logic
+    if asyncio.iscoroutinefunction(func):
+        @wraps(func)
+        async def async_logic(*args, **kwargs):
+            try:
+                return await func(*args, **kwargs)
+            except Exception as e:
+                return DbResult(False, e)
+        return async_logic
+    else:
+        @wraps(func)
+        def sync_logic(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                return DbResult(False, e.__str__())
+        return sync_logic

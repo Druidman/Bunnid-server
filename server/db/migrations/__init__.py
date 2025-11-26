@@ -2,15 +2,15 @@ from .migrateUserSessions import *
 from .migrateUsers import *
 from .migrateUserRTSessions import *
 from .migrateChatSystem import *
-import sqlite3
+import asyncpg
 
-def migrate(dbConn: sqlite3.Connection) -> bool:
-    if not migrate_user_sessions(dbConn.cursor()):
+async def migrate(connPool: asyncpg.Pool) -> bool:
+    if not await migrate_user_sessions(connPool):
         return False
-    if not migrate_user_RT_sessions(dbConn.cursor()):
+    if not await migrate_user_RT_sessions(connPool):
         return False
-    if not migrate_users(dbConn.cursor()):
+    if not await migrate_users(connPool):
         return False
-    if not migrate_chat_system(dbConn.cursor()):
+    if not await migrate_chat_system(connPool):
         return False
     return True

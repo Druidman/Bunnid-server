@@ -1,31 +1,32 @@
-import sqlite3
+import asyncpg
 from ..utils import DbResult, dbFunction
 
 @dbFunction
-def migrate_chat_system(db: sqlite3.Cursor) -> DbResult:
+async def migrate_chat_system(connPool: asyncpg.Pool) -> DbResult:
     
-    db.execute("CREATE TABLE IF NOT EXISTS messages(" \
-            "id INTEGER PRIMARY KEY AUTOINCREMENT," \
-            "conversationId INTEGER," \
-            "userId INTEGER," \
-            "content TEXT" \
-        ")"
-    )
-    db.connection.commit()
+    async with connPool.acquire() as conn:
+        await conn.execute("CREATE TABLE IF NOT EXISTS messages(" \
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," \
+                "conversationId INTEGER," \
+                "userId INTEGER," \
+                "content TEXT" \
+            ")"
+        )
+        
 
-    db.execute("CREATE TABLE IF NOT EXISTS conversations(" \
-            "id INTEGER PRIMARY KEY AUTOINCREMENT," \
-            "title TEXT" \
-        ")"
-    )
-    db.connection.commit()
+        await conn.execute("CREATE TABLE IF NOT EXISTS conversations(" \
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," \
+                "title TEXT" \
+            ")"
+        )
+        
 
-    db.execute("CREATE TABLE IF NOT EXISTS conversation_members(" \
-            "conversationId INTEGER PRIMARY KEY AUTOINCREMENT," \
-            "userId INTEGER" \
-        ")"
-    )
-    db.connection.commit()
+        await conn.execute("CREATE TABLE IF NOT EXISTS conversation_members(" \
+                "conversationId INTEGER PRIMARY KEY AUTOINCREMENT," \
+                "userId INTEGER" \
+            ")"
+        )
+    
     return DbResult(True, True)
     
     

@@ -1,19 +1,25 @@
-import sqlite3
+import asyncpg
 from ..utils import DbResult, dbFunction
 
 @dbFunction
-def check_if_token_in_db(token: str, db: sqlite3.Cursor) -> DbResult:
-    
-    db.execute("SELECT id FROM UserRTSessions WHERE token=:token LIMIT 1",{"token": token})
-    if (db.fetchone()):
+async def check_if_token_in_db(token: str, connPool: asyncpg.Pool) -> DbResult:
+    if not token:
+        return DbResult(True, False) 
+    async with connPool.acquire() as conn:
+        row = await conn.fetchrow("SELECT id FROM UserRTSessions WHERE token=:token LIMIT 1",{"token": token})
+    if (row):
         return DbResult(True, True)
     else:
         return DbResult(True, False) 
    
 @dbFunction
-def add_token_to_db(token: str, db: sqlite3.Cursor) -> DbResult:
-    db.execute("INSERT INTO UserRTSessions(token) VALUES(:token)",{"token": token})
-    db.connection.commit()
+async def add_token_to_db(token: str, connPool: asyncpg.Pool) -> DbResult:
+    if not token:
+        return DbResult(True, False) 
+    
+    async with connPool.acquire() as conn:
+        conn.execute("INSERT INTO UserRTSessions(token) VALUES(:token)",{"token": token})
+    
     return DbResult(True, True)
 
 

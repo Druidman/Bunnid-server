@@ -1,13 +1,21 @@
-import sqlite3
+import asyncpg
+
 from .migrations import migrate
 
 
-def connectDb() -> sqlite3.Connection | None:
-    dbConn = sqlite3.connect("database.db", check_same_thread=False)
-    dbConn.row_factory = sqlite3.Row
+async def connectDb() ->  asyncpg.Pool | None:
+    pool:  asyncpg.Pool = await asyncpg.create_pool(
+        user="testUser",
+        password="test",
+        database="testDb",
+        port=5432,
+        host="localhost",
+        min_size=5,
+        max_size=20
+    )
     
-    if (migrate(dbConn=dbConn)):
-        return dbConn
+    if (await migrate(connPool=pool)):
+        return pool
     else:
         return None
 
