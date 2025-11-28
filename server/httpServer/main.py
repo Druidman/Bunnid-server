@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import *
 import uvicorn
@@ -23,9 +23,14 @@ def run_http_server() -> None:
     def healthz() -> dict[str, str]:
         return {"status": "OK"}
     
-    app.include_router(auth_router, prefix="/api")
-    app.include_router(session_router, prefix="/session")
-    app.include_router(service_router, prefix="/service")
+
+    api = APIRouter(prefix="/api")
+    
+    api.include_router(auth_router)
+    api.include_router(service_router)
+
+
+    app.include_router(api)
     
     uvicorn.run(app, host="0.0.0.0", port=5000)
 

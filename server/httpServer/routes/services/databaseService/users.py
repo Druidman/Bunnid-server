@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
 import server.globals as globals
-from server.httpServer.auth.user_session import userSession
 from server.db.tables.users import get_users_preview
 
 users_router = APIRouter(prefix="/users")
@@ -12,7 +11,6 @@ def usersMain() -> str:
 
 
 @users_router.route("/get", methods=["GET"])
-@userSession
 async def usersGet() -> globals.APIResponse:
     result = await get_users_preview(100,db=globals.connPool)
     return globals.api_response_from_db_response(result)

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from .databaseService import users
+from .databaseService import users_router
 
 database_router = APIRouter(prefix="/database")
 
-database_router.include_router(users)
+database_router.include_router(users_router)
 
 
 @database_router.get("/")

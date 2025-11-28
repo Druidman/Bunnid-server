@@ -1,4 +1,6 @@
+
 import secrets
+from fastapi import Header, HTTPException
 
 from server import globals
 from server.db.tables.userSessions import check_if_token_in_db, add_token_to_db
@@ -23,11 +25,8 @@ async def make_user_session(userId: str) -> str:
         return token
 
 
-def userSession(func):
-    # TODO: This decorator needs to be updated to work with async functions in FastAPI
-    def validateToken(*args, **kwargs):
-        # This is deprecated for FastAPI - use Depends() instead
-        return func(*args, **kwargs)
+async def verify_user_session(token: str = Header(..., alias="X-User-Session-Token")):
+    if (not await check_if_valid_token(token)):
+        raise HTTPException(status_code=401, detail="Wrong user session token")
     
-    validateToken.__name__ = func.__name__
-    return validateToken
+    

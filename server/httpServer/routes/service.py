@@ -1,11 +1,14 @@
-from fastapi import APIRouter
-from .services import conversation
-from .services import database
+from fastapi import APIRouter, Depends
+from .services import conversation_router
+from .services import database_router
+from .services import session_router
+from server.httpServer.auth.user_session import verify_user_session
 
-service_router = APIRouter(prefix="/service")
+service_router = APIRouter(prefix="/service", dependencies=[Depends(verify_user_session)])
 
-service_router.include_router(conversation)
-service_router.include_router(database)
+service_router.include_router(conversation_router)
+service_router.include_router(database_router)
+service_router.include_router(session_router)
 
 
 @service_router.get("/")

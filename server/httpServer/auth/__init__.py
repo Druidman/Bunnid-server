@@ -1,1 +1,1 @@
-from .user_session import check_if_valid_token, make_user_session, userSession
+from .user_session import check_if_valid_token, make_user_session, verify_user_session
