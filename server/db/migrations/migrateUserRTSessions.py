@@ -5,9 +5,8 @@ from ..utils import DbResult, dbFunction
 async def migrate_user_RT_sessions(connPool: asyncpg.Pool) -> DbResult:
     async with connPool.acquire() as conn:
         await conn.execute("CREATE TABLE IF NOT EXISTS UserRTSessions(" \
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," \
-                "token TEXT," \
-                "unique(token)" \
+                "id SERIAL PRIMARY KEY," \
+                "token TEXT UNIQUE" \
             ")"
         )
   

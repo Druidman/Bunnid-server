@@ -7,7 +7,7 @@ from server.db.utils import DbResult
 async def make_RTS() -> str:
 
     RTS_token = secrets.token_urlsafe(globals.RTS_TOKEN_LENGTH)
-    result: DbResult = await add_token_to_db(token=RTS_token, db=globals.connPool)
+    result: DbResult = await add_token_to_db(token=RTS_token, connPool=globals.connPool)
     if not result.status:
         print(f"Error when adding RT token: {result.msg}")
         return ""

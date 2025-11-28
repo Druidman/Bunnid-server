@@ -14,16 +14,17 @@ class DbResult:
         self.msgAsDbRowObject = msgAsDbRowObject
 
     def makeMsgDict(self) -> bool:
+       
         if not self.msgAsDbRowObject: return False
         if not self.msg: return False
         
         if type(self.msg) == asyncpg.Record:
             self.msgDict = dict(self.msg)
-            print(f"reulat {self.msgDict}")
+          
         elif type(self.msg) == list and type(self.msg[0]) == asyncpg.Record:
 
             self.msgDict = [dict(x) for x in self.msg]
-            print(f"list {self.msgDict}")
+            
         else:
             return False
         

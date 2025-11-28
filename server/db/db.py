@@ -8,11 +8,12 @@ async def connectDb() ->  asyncpg.Pool | None:
         user="testUser",
         password="test",
         database="testDb",
+        host='localhost',
         port=5432,
-        host="localhost",
         min_size=5,
         max_size=20
     )
+    
     
     if (await migrate(connPool=pool)):
         return pool

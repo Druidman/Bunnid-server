@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body
-from server.db.tables.users import check_if_user_exists, add_new_user, get_user_by_login, get_full_user
+from server.db.tables.users import add_new_user, get_full_user
 from ..auth import make_user_session
 
 import server.globals as globals

@@ -18,7 +18,7 @@ async def add_token_to_db(token: str, connPool: asyncpg.Pool) -> DbResult:
         return DbResult(True, False) 
     
     async with connPool.acquire() as conn:
-        conn.execute("INSERT INTO UserRTSessions(token) VALUES($1)",token)
+        await conn.execute("INSERT INTO UserRTSessions(token) VALUES($1)",token)
     
     return DbResult(True, True)
 

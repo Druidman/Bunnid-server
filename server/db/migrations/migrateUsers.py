@@ -5,12 +5,11 @@ from ..utils import DbResult, dbFunction
 async def migrate_users(connPool: asyncpg.Pool) -> DbResult:
     async with connPool.acquire() as conn:
         await conn.execute("CREATE TABLE IF NOT EXISTS Users(" \
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," \
-                "name TEXT," \
-                "login TEXT," \
+                "id SERIAL PRIMARY KEY," \
+                "name TEXT UNIQUE," \
+                "login TEXT UNIQUE," \
                 "password TEXT," \
-                "unique(name, login)" \
-                
+
             ")"
         )
     

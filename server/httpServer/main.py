@@ -2,7 +2,9 @@ from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import *
 import uvicorn
-
+import server.globals as globals
+from server.db import setup_db
+from server.eventPool import setupEventPool
 
 
 
@@ -18,9 +20,14 @@ def run_http_server() -> None:
         allow_methods=["*"],   
         allow_headers=["*"],   
     )
+    @app.on_event("startup")
+    async def startup():
+        await setup_db()
+        setupEventPool() # setup events
 
     @app.get("/healthz")
-    def healthz() -> dict[str, str]:
+    async def healthz() -> dict[str, str]:
+        
         return {"status": "OK"}
     
 
