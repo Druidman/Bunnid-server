@@ -5,10 +5,10 @@ from typing import List
 
 class DbResult:
     status: bool = False
-    msg: List[asyncpg.Record] | asyncpg.Record | str = None
+    msg: List[asyncpg.Record] | asyncpg.Record | str | bool = None
     msgAsDbRowObject: bool = False
     msgDict = []
-    def __init__(self, status: bool, msg: List[asyncpg.Record] | asyncpg.Record | str, msgAsDbRowObject = False):
+    def __init__(self, status: bool, msg: List[asyncpg.Record] | asyncpg.Record | str | bool, msgAsDbRowObject = False):
         self.status = status
         self.msg = msg
         self.msgAsDbRowObject = msgAsDbRowObject
@@ -41,7 +41,7 @@ def dbFunction(func) -> DbResult:
             try:
                 return await func(*args, **kwargs)
             except Exception as e:
-                return DbResult(False, e)
+                return DbResult(False, e.__str__())
         return async_logic
     else:
         @wraps(func)

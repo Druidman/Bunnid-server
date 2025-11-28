@@ -12,7 +12,7 @@ session_router = APIRouter(prefix="/session")
 async def main_route() -> str:
     return "<h1>RT Session Bunnid api</h1>"
 
-@session_router.post("/getRTS")
+@session_router.get("/getRTS")
 async def get_realtime_session() -> globals.APIResponse:
     rts_token: str = await make_RTS()
     if (not rts_token):

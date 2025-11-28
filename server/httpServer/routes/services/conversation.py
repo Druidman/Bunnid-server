@@ -76,7 +76,7 @@ async def conversationGet(
     return globals.api_response_from_db_repsonse(result)
 
 
-@conversation_router.post("/list")
+@conversation_router.get("/list")
 async def conversationList() -> globals.APIResponse:
     result: DbResult = await get_conversations(limit=100, db=globals.connPool)
     return globals.api_response_from_db_repsonse(result)

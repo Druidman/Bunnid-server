@@ -8,19 +8,22 @@ import asyncio
 
 
 async def setup():
+    print("Starting setup")
     await setup_db() # connects db
     
     setupEventPool() # setup events
+    print("Setup ended")
 
 
 def main():
+    print("Running...")
     asyncio.run(setup())
 
     # run_ws_server() # run websocket RT server
     run_http_server() # run bunnid api
+    print("End.")
 
 
 if __name__ == "__main__":
-    
     main()
     

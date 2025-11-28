@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 class APIResponse(BaseModel):
     STATUS: bool
-    MSG: dict | str
+    MSG: dict | str | bool
 
 def api_response_from_db_repsonse(result: DbResult) -> APIResponse:
     print(f"DICT: {result.msgDict}")
@@ -18,7 +18,7 @@ def api_response_from_db_repsonse(result: DbResult) -> APIResponse:
     else:
         return APIResponse(STATUS=result.status, MSG=result.msg)
 
-def API_RESPONSE(stat: bool, msg: dict | str) -> APIResponse:
+def API_RESPONSE(stat: bool, msg: dict | str | bool) -> APIResponse:
     return APIResponse(STATUS=stat, MSG=msg)
 
 
