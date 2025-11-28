@@ -6,7 +6,7 @@ async def check_if_token_in_db(token: str, connPool: asyncpg.Pool) -> DbResult:
     if not token:
         return DbResult(True, False) 
     async with connPool.acquire() as conn:
-        row = await conn.fetchrow("SELECT id FROM UserSessions WHERE token=:token LIMIT 1",{"token": token})
+        row = await conn.fetchrow("SELECT id FROM UserSessions WHERE token=$1 LIMIT 1",token)
     if (row):
         return DbResult(True, True)
     else:
@@ -17,7 +17,7 @@ async def add_token_to_db(token: str, userId: int,  connPool: asyncpg.Pool) -> D
     if (userId <= -1 or not token):
         return DbResult(False, "Wrong token or userId")
     async with connPool.acquire() as conn:
-        await conn.execute("INSERT INTO UserSessions(token, userId) VALUES(:token, :userId)",{"token": token, "userId": userId})
+        await conn.execute("INSERT INTO UserSessions(token, userId) VALUES($1,$2)",token, userId)
     
     return DbResult(True, True)
 
@@ -27,7 +27,7 @@ async def get_token_data(token: str, connPool: asyncpg.Pool) -> DbResult:
     if ( not token):
         return DbResult(False, "Wrong token")
     async with connPool.acquire() as conn:
-        row = await conn.fetchrow("SELECT userId, id FROM UserSessions WHERE token=:token LIMIT 1",{"token": token})
+        row = await conn.fetchrow("SELECT userId, id FROM UserSessions WHERE token=$1 LIMIT 1",token)
     
     
     if not row:

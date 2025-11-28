@@ -7,9 +7,9 @@ async def get_members(convId: int, connPool: asyncpg.Pool) -> DbResult:
         return DbResult(False, "wrong convId")
     
     async with connPool.acquire() as conn:
-        rows = await conn.fetch("SELECT userId FROM conversation_members WHERE conversationId=:convId", {
-            "convId": convId
-        })
+        rows = await conn.fetch("SELECT userId FROM conversation_members WHERE conversationId=$1", 
+            convId
+        )
 
     return DbResult(True, rows, True)
 
@@ -20,8 +20,8 @@ async def add_member(convId: int,userId: int, connPool: asyncpg.Pool) -> DbResul
         return DbResult(False, "wrong convId or userId")
     
     async with connPool.acquire() as conn:
-        conn.execute("INSERT INTO conversation_members(conversationId, userId) VALUES(:convId, :userId)", {
-            "convId": convId,
-            "userId": userId,
-        })
+        conn.execute("INSERT INTO conversation_members(conversationId, userId) VALUES($1,$2)", 
+            convId,
+            userId,
+        )
     return DbResult(True, True)

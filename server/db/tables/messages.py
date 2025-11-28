@@ -6,10 +6,10 @@ async def get_messages(convId: int, limit: int, connPool: asyncpg.Pool) -> DbRes
     if (limit < -1 or convId <= -1):
         return DbResult(False, "wrong values for limit and convId")
     async with connPool.acquire() as conn:
-        rows = await conn.execute("SELECT userId, content FROM messages WHERE conversationId=:convId LIMIT :limit", {
-            "convId": convId,
-            "limit": limit
-        })
+        rows = await conn.execute("SELECT userId, content FROM messages WHERE conversationId=$1 LIMIT $2",
+            convId,
+            limit
+        )
     
     return DbResult(True, rows, True)
 
@@ -19,9 +19,9 @@ async def get_message(messageId: int, connPool: asyncpg.Pool) -> DbResult:
     if (messageId <= -1):
         return DbResult(False, "wrong value messageId")
     async with connPool.acquire() as conn:
-        row = await conn.fetchrow("SELECT userId, content, conversationId FROM messages WHERE id=:messageId", {
-            "messageId": messageId
-        })
+        row = await conn.fetchrow("SELECT userId, content, conversationId FROM messages WHERE id=$1", 
+            messageId
+        )
     
     return DbResult(True, row, True)
 
