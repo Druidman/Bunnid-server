@@ -35,6 +35,7 @@ def run_http_server() -> None:
     
     api.include_router(auth_router)
     api.include_router(service_router)
+    api.include_router(websocket_router)
 
 
     app.include_router(api)
