@@ -1,21 +1,21 @@
-from flask import Blueprint
+
+from fastapi import APIRouter
 from server.httpServer.session.RTSession import make_RTS
-from server import globals
 from server.httpServer.auth.user_session import userSession
 import server.globals as globals
 
 
 
-session_bp = Blueprint("session", __name__)
+session_router = APIRouter(prefix="/session")
 
-@session_bp.route("/", methods=["GET"])
-def main_route():
+@session_router.get("/")
+async def main_route() -> str:
     return "<h1>Session Bunnid api</h1>"
 
-@session_bp.route("/getRTS", methods=["POST"])
+@session_router.post("/getRTS")
 @userSession # validates userSession (user session token)
-def get_realtime_session():
-    rts_token: str = make_RTS()
+async def get_realtime_session() -> globals.APIResponse:
+    rts_token: str = await make_RTS()
     if (not rts_token):
         return globals.errors["FAILED_TO_ASSIGN_TOKEN"]
     

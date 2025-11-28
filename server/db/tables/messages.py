@@ -32,10 +32,11 @@ async def add_message(convId: int, userId: int, content: str, connPool: asyncpg.
     if (userId <= -1 or convId <= -1 or content==""):
         return DbResult(False, "wrong values for userId or content or convId")
     async with connPool.acquire() as conn:
-        conn.execute("INSERT INTO messages(conversationId, userId, content) VALUES(:convId, :userId, :content)", {
-            "convId": convId,
-            "userId": userId,
-            "content": content
-        })
+        messageId = conn.fetchval(
+            "INSERT INTO messages(conversationId, userId, content) VALUES($1,$2,$3) RETURNING id", 
+            convId,
+            userId,
+            content
+        )
     
-    return DbResult(True, True)
+    return DbResult(True, messageId)

@@ -1,27 +1,30 @@
 
-import sqlite3
+import asyncpg
 from server.db.utils import DbResult
 from server.eventPool.EventPool import EventPool
 from server.eventPool.events.ConversationMsgEvent import ConversationMsgEvent
+from pydantic import BaseModel
 
-def api_response_from_db_repsonse(result: DbResult) -> dict:
+
+class APIResponse(BaseModel):
+    STATUS: bool
+    MSG: dict | str
+
+def api_response_from_db_repsonse(result: DbResult) -> APIResponse:
     print(f"DICT: {result.msgDict}")
     print(f"MSG: {result.msg}")
     if result.makeMsgDict():
-        return API_RESPONSE(result.status, result.msgDict)
+        return APIResponse(STATUS=result.status, MSG=result.msgDict)
     else:
-        return API_RESPONSE(result.status, result.msg)
-    
+        return APIResponse(STATUS=result.status, MSG=result.msg)
 
-API_RESPONSE = lambda stat, msg: {
-    "STATUS": stat,
-    "MSG": msg
-}
+def API_RESPONSE(stat: bool, msg: dict | str) -> APIResponse:
+    return APIResponse(STATUS=stat, MSG=msg)
 
 
 USER_TOKEN_LENGTH: int = 15
 RTS_TOKEN_LENGTH: int = 15
-dbConn: sqlite3.Connection | None = None
+connPool: asyncpg.Pool | None = None
 eventPool: EventPool = None
 conversation_msg_event: ConversationMsgEvent = None
 

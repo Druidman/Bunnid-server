@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .blueprints import *
-import os
+from .routes import *
+import uvicorn
 
 
 
-def run_http_server():
+
+def run_http_server() -> None:
     app = FastAPI()
     origins = [
         "http://localhost:5173"
@@ -18,13 +19,13 @@ def run_http_server():
         allow_headers=["*"],   
     )
 
-    @app.route("/healthz", methods=["GET", "HEAD"])
-    async def healthz():
-        return "OK", 200
+    @app.get("/healthz")
+    def healthz() -> dict[str, str]:
+        return {"status": "OK"}
     
-    # app.register_blueprint(auth_bp, url_prefix="/api/auth")
-    # app.register_blueprint(session_bp, url_prefix="/api/session")
-    # app.register_blueprint(docs_bp, url_prefix="/api/docs")
-    # app.register_blueprint(service_bp, url_prefix="/api/service")
-    # app.run(host="0.0.0.0", port=5000)
+    app.include_router(auth_router, prefix="/api")
+    app.include_router(session_router, prefix="/session")
+    app.include_router(service_router, prefix="/service")
+    
+    uvicorn.run(app, host="0.0.0.0", port=5000)
 
