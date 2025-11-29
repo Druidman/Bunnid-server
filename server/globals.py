@@ -10,6 +10,10 @@ class APIResponse(BaseModel):
     STATUS: bool
     MSG: dict | str | bool
 
+def validateObject(object: dict, keys: list[str]) -> bool:
+    return set(object.keys()) == set(keys)
+ 
+
 def api_response_from_db_repsonse(result: DbResult) -> APIResponse:
     print(f"DICT: {result.msgDict}")
     print(f"MSG: {result.msg}")

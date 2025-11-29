@@ -3,8 +3,8 @@ from server.httpServer import run_http_server
 def main():
     print("Running...")
 
-    # run_ws_server() # run websocket RT server
-    run_http_server() # run bunnid api
+    run_http_server() # run api
+
     print("End.")
 
 

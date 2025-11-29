@@ -6,6 +6,6 @@ class ConversationMsgEventListener(EventListener[Callable[[int],None]]):
         self.conversationId = conversationId
         super().__init__(callback)
         
-    def __call__(self, messageId: int) -> None:
+    async def __call__(self, messageId: int) -> None:
         
-        return self.listener_callback(messageId)
+        return await self.listener_callback(messageId)

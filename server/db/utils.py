@@ -7,7 +7,9 @@ class DbResult:
     status: bool = False
     msg: List[asyncpg.Record] | asyncpg.Record | str | bool = None
     msgAsDbRowObject: bool = False
-    msgDict = []
+    msgDict: dict = {
+        "dbResult": list
+    }
     def __init__(self, status: bool, msg: List[asyncpg.Record] | asyncpg.Record | str | bool, msgAsDbRowObject = False):
         self.status = status
         self.msg = msg
@@ -19,11 +21,11 @@ class DbResult:
         if not self.msg: return False
         
         if type(self.msg) == asyncpg.Record:
-            self.msgDict = dict(self.msg)
+            self.msgDict["dbResult"] = [dict(self.msg)]
           
         elif type(self.msg) == list and type(self.msg[0]) == asyncpg.Record:
 
-            self.msgDict = [dict(x) for x in self.msg]
+            self.msgDict["dbResult"] = [dict(x) for x in self.msg]
             
         else:
             return False
