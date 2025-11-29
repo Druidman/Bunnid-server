@@ -34,7 +34,7 @@ R = TypeVar("R")
 def dbFunction(func: Callable[P, R]) -> Callable[P, R]:
     if asyncio.iscoroutinefunction(func):
         @wraps(func)
-        async def async_logic(*args: P.args, **kwargs: R.kwargs) -> "DbResult[R]":
+        async def async_logic(*args, **kwargs) -> "DbResult[R]":
             try:
                 result: DbResult[R] = await func(*args, **kwargs)
                 return result
@@ -43,7 +43,7 @@ def dbFunction(func: Callable[P, R]) -> Callable[P, R]:
         return async_logic
     else:
         @wraps(func)
-        def sync_logic(*args: P.args, **kwargs: R.kwargs) -> DbResult[R]:
+        def sync_logic(*args, **kwargs) -> DbResult[R]:
             try:
                 return func(*args, **kwargs)
             except Exception as e:

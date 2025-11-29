@@ -1,3 +1,5 @@
+from typing import Optional
+import asyncpg
 from fastapi import APIRouter, Body
 from server.db.tables.users import add_new_user, get_full_user
 from ..auth import make_user_session
@@ -22,24 +24,17 @@ async def login(
     password: str = Body(..., min_length=1)
 ) -> globals.APIResponse[LoginResponse]:
     
-    res: DbResult= await get_full_user(login, password, globals.connPool) 
+    res: DbResult[Optional[asyncpg.Record]] = await get_full_user(login, password, globals.connPool) 
     if (res.error):
-        return globals.errors["LOGIN_TRY_AGAIN"]
+        return globals.API_RESPONSE(error=res.error, response=None)
     
-    if (not res.msg):
-        return globals.errors["INCORRECT_LOGIN_VALUES"]
-    
-    if (not res.makeMsgObject()):
-        return globals.errors["LOGIN_TRY_AGAIN"]
-    
-
-    token = await make_user_session(user_id=res.msgObject[0]["id"])
+    token = await make_user_session(user_id=res.result.get("id"))
     if not token:
         return globals.errors["FAILED_TO_ASSIGN_TOKEN"]
     else:
-        return globals.API_RESPONSE(True, {
+        return globals.API_RESPONSE(response = {
             "token": token, 
-            "user_id": res.msgObject[0]["id"]
+            "user_id": res.result.get("id")
         })
 
 class RegisterResponse(BaseModel):
@@ -52,10 +47,10 @@ async def register(
     name: str = Body(..., min_length=1)
 ) -> globals.APIResponse[RegisterResponse]:
     if (not name or not login or not password):
-        return globals.API_RESPONSE(False, "Password, name, login not provided")
+        return globals.API_RESPONSE[None](error="Password, name, login not provided", response=None)
     
-    res: DbResult = await add_new_user(name, login, password, globals.connPool)
+    res: DbResult[Optional[bool]] = await add_new_user(name, login, password, globals.connPool)
     
-    return globals.API_RESPONSE(res.status, res.msg)
+    return globals.API_RESPONSE(error=res.error, response=res.result)
 
 
