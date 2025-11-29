@@ -28,8 +28,8 @@ class Event(ABC, Generic[T, B]):
         return True
 
 
-    def notify(self, additionalEventInfo: B = None) -> None:
-        return self.notify_listeners(additionalEventInfo)
+    async def notify(self, additionalEventInfo: B = None) -> None:
+        return await self.notify_listeners(additionalEventInfo)
     
     @abstractmethod
-    def notify_listeners(self, additionalEventInfo: B = None): pass
+    async def notify_listeners(self, additionalEventInfo: B = None): pass

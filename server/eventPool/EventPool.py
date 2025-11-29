@@ -7,12 +7,12 @@ class EventPool:
     def __init__(self):
         self.events: Dict[EventType, List[ Event ] ] = {}
 
-    def notify_event(self, eventType: EventType, additionalEventInfo=None) -> bool:
+    async def notify_event(self, eventType: EventType, additionalEventInfo=None) -> bool:
         if not self.checkIfValidEventType(eventType):
             return False
         
         for event in self.events[eventType]:
-            event.notify(additionalEventInfo)
+            await event.notify(additionalEventInfo)
 
 
         return True

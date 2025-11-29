@@ -11,7 +11,7 @@ class ConversationMsgEvent(Event[ConversationMsgEventListener, ConversationMsgEv
     def __init__(self):
         super().__init__(EventType.NEW_MSG_IN_CONVERSATION)
         
-    def notify_listeners(self, additionalEventInfo) -> None:
+    async def notify_listeners(self, additionalEventInfo) -> None:
         if not additionalEventInfo:
             return # Because in this event this is required 
         
@@ -19,10 +19,10 @@ class ConversationMsgEvent(Event[ConversationMsgEventListener, ConversationMsgEv
         conversationId: int = additionalEventInfo.conversationId
 
         for listener in self.listeners:
-            # print(str(listener.conversationId) + " " + str(conversationId))
+            print(str(listener.conversationId) + " " + str(conversationId))
             if listener.conversationId == conversationId:
                 print("Listener notified")
-                listener(additionalEventInfo.messageId)
+                await listener(additionalEventInfo.messageId)
 
         
     

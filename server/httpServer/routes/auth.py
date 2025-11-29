@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Body
 from server.db.tables.users import add_new_user, get_full_user
 from ..auth import make_user_session
+from pydantic import BaseModel
 
 import server.globals as globals
 from server.db.utils import DbResult
@@ -11,11 +12,15 @@ auth_router = APIRouter(prefix="/auth")
 async def testRoute() -> str:
     return "<h1>Auth Bunnid API</h1>"
 
+class LoginResponse(BaseModel):
+    token: str
+    user_id: int
+
 @auth_router.post("/login")
 async def login(
     login: str = Body(..., min_length=1),
     password: str = Body(..., min_length=1)
-) -> globals.APIResponse:
+) -> globals.APIResponse[LoginResponse]:
     res: DbResult = await get_full_user(login, password, globals.connPool) 
     if (not res.status):
         return globals.errors["LOGIN_TRY_AGAIN"]
@@ -33,16 +38,18 @@ async def login(
     else:
         return globals.API_RESPONSE(True, {
             "token": token, 
-            "userId": res.msgObject[0]["id"]
+            "user_id": res.msgObject[0]["id"]
         })
 
+class RegisterResponse(BaseModel):
+    result: bool
 
 @auth_router.post("/register")
 async def register(
     login: str = Body(..., min_length=1),
     password: str = Body(..., min_length=1),
     name: str = Body(..., min_length=1)
-) -> globals.APIResponse:
+) -> globals.APIResponse[RegisterResponse]:
     if (not name or not login or not password):
         return globals.API_RESPONSE(False, "Password, name, login not provided")
     

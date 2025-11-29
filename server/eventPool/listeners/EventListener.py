@@ -10,4 +10,4 @@ class EventListener(Generic[T], ABC):
         self.listener_callback: T = callback
 
     @abstractmethod
-    def __call__(self) -> None: pass
+    async def __call__(self) -> None: pass

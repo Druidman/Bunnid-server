@@ -1,4 +1,6 @@
 
+from ast import Dict
+from typing import TypedDict
 from fastapi import APIRouter, Body
 from server.db.tables.conversations import get_conversation, add_conversation, get_conversations
 from server.db.tables.messages import get_messages, add_message
@@ -8,6 +10,7 @@ from server.eventPool.events.ConversationMsgEvent import ConversationMsgEventDat
 
 import server.globals as globals
 from server.db.utils import DbResult
+from pydantic import BaseModel
 
 conversation_router = APIRouter(prefix="/conversation")
 
@@ -18,13 +21,15 @@ conversation_router = APIRouter(prefix="/conversation")
 def conversationMain() -> str:
     return "<h1>This is conversation api!</h1>"
 
+class ConversationSendResponse(BaseModel):
+    result: int
 
 @conversation_router.post("/send")
 async def conversationSendMsg(
     conversationId: int = Body(...),
     msgContent: str = Body(...),
     userId: int = Body(...)
-) -> globals.APIResponse:
+) -> globals.APIResponse[ConversationSendResponse]:
     result: DbResult = await add_message(
         conv_id=conversationId, 
         user_id=userId, 
@@ -32,15 +37,25 @@ async def conversationSendMsg(
         connPool=globals.connPool
     )
     print(f"FETCHED ID: {result.msg}")
-    globals.eventPool.notify_event(EventType.NEW_MSG_IN_CONVERSATION, ConversationMsgEventData(conversationId, result.msg))
+    await globals.eventPool.notify_event(EventType.NEW_MSG_IN_CONVERSATION, ConversationMsgEventData(conversationId, result.msg))
     return globals.api_response_from_db_repsonse(result)
   
 
+
+class MessageElement(TypedDict):
+    user_id: int
+    content: str
+    id: int
+class ConversationGetMessagesResponse(BaseModel):
+    messages: list[MessageElement]
+
 @conversation_router.post("/getMessages")
-async def conversationGetMessages(conversationId: int = Body(embed=True)) -> globals.APIResponse:
+async def conversationGetMessages(conversationId: int = Body(embed=True)) -> globals.APIResponse[ConversationGetMessagesResponse]:
     result = await get_messages(conv_id=conversationId, limit=100, connPool=globals.connPool)
 
-    return globals.api_response_from_db_repsonse(result)
+    return globals.api_response_from_db_repsonse(result,wrapperKey="messages")
+
+
 
 
 @conversation_router.post("/create")

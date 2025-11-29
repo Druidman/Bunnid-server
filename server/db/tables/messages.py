@@ -6,7 +6,7 @@ async def get_messages(conv_id: int, limit: int, connPool: asyncpg.Pool) -> DbRe
     if (limit < -1 or conv_id <= -1):
         return DbResult(False, "wrong values for limit or conv_id")
     async with connPool.acquire() as conn:
-        rows = await conn.fetch("SELECT user_id, content FROM messages WHERE conversation_id=$1 LIMIT $2",
+        rows = await conn.fetch("SELECT user_id, content, id FROM messages WHERE conversation_id=$1 LIMIT $2",
             conv_id,
             limit
         )

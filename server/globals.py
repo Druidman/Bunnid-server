@@ -4,24 +4,32 @@ from server.db.utils import DbResult
 from server.eventPool.EventPool import EventPool
 from server.eventPool.events.ConversationMsgEvent import ConversationMsgEvent
 from pydantic import BaseModel
+from typing import Generic, TypeVar
 
-
-class APIResponse(BaseModel):
+T = TypeVar("T")
+class APIResponse(BaseModel, Generic[T]):
     STATUS: bool
-    MSG: dict | str | bool | list
+    MSG: T
 
 def validateObject(object: dict, keys: list[str]) -> bool:
+    if type(object) != dict:
+        return False
     return set(object.keys()) == set(keys)
  
 
-def api_response_from_db_repsonse(result: DbResult) -> APIResponse:
+def api_response_from_db_repsonse(result: DbResult, wrapperKey: str = "") -> APIResponse:
     print(f"DICT: {result.msgObject}")
     print(f"MSG: {result.msg}")
     if result.makeMsgObject():
-        return APIResponse(STATUS=result.status, MSG=result.msgObject)
+        if wrapperKey:
+            return APIResponse(STATUS=result.status, MSG={wrapperKey: result.msgObject})
+        else:
+            return APIResponse(STATUS=result.status, MSG=result.msgObject)
     else:
-        return APIResponse(STATUS=result.status, MSG=result.msg)
-
+        if wrapperKey:
+            return APIResponse(STATUS=result.status, MSG={wrapperKey: result.msg})
+        else:
+            return APIResponse(STATUS=result.status, MSG=result.msg)
 def API_RESPONSE(stat: bool, msg: dict | str | bool) -> APIResponse:
     return APIResponse(STATUS=stat, MSG=msg)
 
