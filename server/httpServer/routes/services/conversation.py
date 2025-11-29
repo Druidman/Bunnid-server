@@ -26,10 +26,10 @@ async def conversationSendMsg(
     userId: int = Body(...)
 ) -> globals.APIResponse:
     result: DbResult = await add_message(
-        convId=conversationId, 
-        userId=userId, 
+        conv_id=conversationId, 
+        user_id=userId, 
         content=msgContent, 
-        db=globals.connPool
+        connPool=globals.connPool
     )
     print(f"FETCHED ID: {result.msg}")
     globals.eventPool.notify_event(EventType.NEW_MSG_IN_CONVERSATION, ConversationMsgEventData(conversationId, result.msg))
@@ -37,15 +37,15 @@ async def conversationSendMsg(
   
 
 @conversation_router.post("/getMessages")
-async def conversationGetMessages(conversationId: int = Body(...)) -> globals.APIResponse:
-    result = await get_messages(convId=conversationId, limit=100, db=globals.connPool)
+async def conversationGetMessages(conversationId: int = Body(embed=True)) -> globals.APIResponse:
+    result = await get_messages(conv_id=conversationId, limit=100, connPool=globals.connPool)
 
     return globals.api_response_from_db_repsonse(result)
 
 
 @conversation_router.post("/create")
-async def conversationCreate(conversationTitle:str = Body(...)) -> globals.APIResponse:
-    result = await add_conversation(title=conversationTitle, db=globals.connPool)
+async def conversationCreate(conversationTitle:str = Body(embed=True)) -> globals.APIResponse:
+    result = await add_conversation(title=conversationTitle, connPool=globals.connPool)
 
     return globals.api_response_from_db_repsonse(result)
 
@@ -55,30 +55,30 @@ async def conversationAddMember(
     conversationId: int = Body(...),
     memberId: int = Body(...)
 ) -> globals.APIResponse:
-    result = await add_member(convId=conversationId, userId=memberId, db=globals.connPool)
+    result = await add_member(conv_id=conversationId, user_id=memberId, connPool=globals.connPool)
 
     return globals.api_response_from_db_repsonse(result)
 
 @conversation_router.post("/getMembers")
 async def conversationGetMembers(
-    conversationId: int = Body(...)
+    conversationId: int = Body(embed=True)
 ) -> globals.APIResponse:
-    result = await get_members(convId=conversationId, db=globals.connPool)
+    result = await get_members(conv_id=conversationId, connPool=globals.connPool)
 
     return globals.api_response_from_db_repsonse(result)
     
 @conversation_router.post("/get")
 async def conversationGet(
-    conversationId: int = Body(...)
+    conversationId: int = Body(embed=True)
 ) -> globals.APIResponse:
-    result = await get_conversation(convId=conversationId, db=globals.connPool)
+    result = await get_conversation(conv_id=conversationId, connPool=globals.connPool)
 
     return globals.api_response_from_db_repsonse(result)
 
 
 @conversation_router.get("/list")
 async def conversationList() -> globals.APIResponse:
-    result: DbResult = await get_conversations(limit=100, db=globals.connPool)
+    result: DbResult = await get_conversations(limit=100, connPool=globals.connPool)
     return globals.api_response_from_db_repsonse(result)
 
 

@@ -2,13 +2,13 @@ import asyncpg
 from ..utils import DbResult, dbFunction
 
 @dbFunction
-async def get_conversation(convId: int, connPool: asyncpg.Pool) -> DbResult:
-    if (convId <= -1):
-        return DbResult(False, "wrong convId")
+async def get_conversation(conv_id: int, connPool: asyncpg.Pool) -> DbResult:
+    if (conv_id <= -1):
+        return DbResult(False, "wrong conv_id")
     
     async with connPool.acquire() as conn:
         row = await conn.fetchrow("SELECT title, id FROM conversations WHERE id=$1 LIMIT 1", 
-            convId
+            conv_id
         )
 
     if (not row):
@@ -47,7 +47,7 @@ async def add_conversation(title: str, connPool: asyncpg.Pool) -> DbResult:
     if (title==""):
         return DbResult(False, "wrong title")
     async with connPool.acquire() as conn:
-        conn.execute("INSERT INTO conversations(title) VALUES($1)", 
+        await conn.execute("INSERT INTO conversations(title) VALUES($1)", 
             title
         )
     

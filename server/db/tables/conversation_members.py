@@ -2,26 +2,26 @@ import asyncpg
 from ..utils import DbResult, dbFunction
 
 @dbFunction
-async def get_members(convId: int, connPool: asyncpg.Pool) -> DbResult:
-    if (convId <= -1):
-        return DbResult(False, "wrong convId")
+async def get_members(conv_id: int, connPool: asyncpg.Pool) -> DbResult:
+    if (conv_id <= -1):
+        return DbResult(False, "wrong conv_id")
     
     async with connPool.acquire() as conn:
-        rows = await conn.fetch("SELECT userId FROM conversation_members WHERE conversationId=$1", 
-            convId
+        rows = await conn.fetch("SELECT user_id FROM conversation_members WHERE conversation_id=$1", 
+            conv_id
         )
 
     return DbResult(True, rows, True)
 
 
 @dbFunction
-async def add_member(convId: int,userId: int, connPool: asyncpg.Pool) -> DbResult:
-    if (convId <= -1 or userId <= -1):
-        return DbResult(False, "wrong convId or userId")
+async def add_member(conv_id: int,user_id: int, connPool: asyncpg.Pool) -> DbResult:
+    if (conv_id <= -1 or user_id <= -1):
+        return DbResult(False, "wrong conv_id or user_id")
     
     async with connPool.acquire() as conn:
-        conn.execute("INSERT INTO conversation_members(conversationId, userId) VALUES($1,$2)", 
-            convId,
-            userId,
+        conn.execute("INSERT INTO conversation_members(conversation_id, user_id) VALUES($1,$2)", 
+            conv_id,
+            user_id,
         )
     return DbResult(True, True)

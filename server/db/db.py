@@ -5,9 +5,9 @@ from .migrations import migrate
 
 async def connectDb() ->  asyncpg.Pool | None:
     pool:  asyncpg.Pool = await asyncpg.create_pool(
-        user="testUser",
-        password="test",
-        database="testDb",
+        user="bunnidAdmin",
+        password="nimda",
+        database="bunnidDb",
         host='localhost',
         port=5432,
         min_size=5,

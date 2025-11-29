@@ -1,5 +1,5 @@
 import secrets
-from server.db.tables.userRTSessions import add_token_to_db
+from server.db.tables.user_rt_sessions import add_token_to_db
 import server.globals as globals
 from server.db.utils import DbResult
 

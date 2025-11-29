@@ -2,25 +2,27 @@ import asyncpg
 from ..utils import DbResult, dbFunction
 
 @dbFunction
-async def get_messages(convId: int, limit: int, connPool: asyncpg.Pool) -> DbResult:
-    if (limit < -1 or convId <= -1):
-        return DbResult(False, "wrong values for limit and convId")
+async def get_messages(conv_id: int, limit: int, connPool: asyncpg.Pool) -> DbResult:
+    if (limit < -1 or conv_id <= -1):
+        return DbResult(False, "wrong values for limit or conv_id")
     async with connPool.acquire() as conn:
-        rows = await conn.execute("SELECT userId, content FROM messages WHERE conversationId=$1 LIMIT $2",
-            convId,
+        rows = await conn.fetch("SELECT user_id, content FROM messages WHERE conversation_id=$1 LIMIT $2",
+            conv_id,
             limit
         )
+    
+    print(rows)
     
     return DbResult(True, rows, True)
 
 
 @dbFunction
-async def get_message(messageId: int, connPool: asyncpg.Pool) -> DbResult:
-    if (messageId <= -1):
-        return DbResult(False, "wrong value messageId")
+async def get_message(message_id: int, connPool: asyncpg.Pool) -> DbResult:
+    if (message_id <= -1):
+        return DbResult(False, "wrong value message_id")
     async with connPool.acquire() as conn:
-        row = await conn.fetchrow("SELECT userId, content, conversationId FROM messages WHERE id=$1", 
-            messageId
+        row = await conn.fetchrow("SELECT user_id, content, conversation_id FROM messages WHERE id=$1", 
+            message_id
         )
     
     return DbResult(True, row, True)
@@ -28,15 +30,15 @@ async def get_message(messageId: int, connPool: asyncpg.Pool) -> DbResult:
 
 
 @dbFunction
-async def add_message(convId: int, userId: int, content: str, connPool: asyncpg.Pool) -> DbResult:
-    if (userId <= -1 or convId <= -1 or content==""):
-        return DbResult(False, "wrong values for userId or content or convId")
+async def add_message(conv_id: int, user_id: int, content: str, connPool: asyncpg.Pool) -> DbResult:
+    if (user_id <= -1 or conv_id <= -1 or content==""):
+        return DbResult(False, "wrong values for user_id or content or conv_id")
     async with connPool.acquire() as conn:
-        messageId = conn.fetchval(
-            "INSERT INTO messages(conversationId, userId, content) VALUES($1,$2,$3) RETURNING id", 
-            convId,
-            userId,
+        message_id: int = await conn.fetchval(
+            "INSERT INTO messages(conversation_id, user_id, content) VALUES($1,$2,$3) RETURNING id", 
+            conv_id,
+            user_id,
             content
         )
     
-    return DbResult(True, messageId)
+    return DbResult(True, {"result": message_id})

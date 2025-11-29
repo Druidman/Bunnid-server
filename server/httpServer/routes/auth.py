@@ -23,17 +23,17 @@ async def login(
     if (not res.msg):
         return globals.errors["INCORRECT_LOGIN_VALUES"]
     
-    if (not res.makeMsgDict()):
+    if (not res.makeMsgObject()):
         return globals.errors["LOGIN_TRY_AGAIN"]
     
 
-    token = await make_user_session(res.msgDict["id"])
+    token = await make_user_session(user_id=res.msgObject[0]["id"])
     if not token:
         return globals.errors["FAILED_TO_ASSIGN_TOKEN"]
     else:
         return globals.API_RESPONSE(True, {
             "token": token, 
-            "userId": res.msgDict["id"]
+            "userId": res.msgObject[0]["id"]
         })
 
 

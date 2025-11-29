@@ -39,8 +39,8 @@ class Client:
         if not messageRes.status:
             return
         
-        if messageRes.makeMsgDict():
-            await self.sendMsg(WsMessage(WsEvent.NEW_CONVERSATION_MSG__INFO, "", next(self.requestIdGen), messageRes.msgDict))
+        if messageRes.makeMsgObject():
+            await self.sendMsg(WsMessage(WsEvent.NEW_CONVERSATION_MSG__INFO, "", next(self.requestIdGen), messageRes.msgObject))
         
     def registerNewConversationMsgEventListener(self, conversationId: int) -> None:
         listener: ConversationMsgEventListener = ConversationMsgEventListener(self.sendNewConversationMsg, conversationId=int(conversationId))

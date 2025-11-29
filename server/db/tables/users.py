@@ -6,7 +6,7 @@ async def check_if_user_exists(login: str, password: str, connPool: asyncpg.Pool
     if (not login or not password): return DbResult(False, "Incorrect login or password")
     
     async with connPool.acquire() as conn:
-        row = await conn.fetchrow("SELECT * FROM Users WHERE login=$1 AND password=$1 LIMIT 1",
+        row = await conn.fetchrow("SELECT * FROM users WHERE login=$1 AND password=$1 LIMIT 1",
             login,
             password
         )
@@ -21,7 +21,7 @@ async def get_full_user(login: str, password: str, connPool: asyncpg.Pool) -> Db
     if (not login or not password): return DbResult(False, "Incorrect login or password")
     
     async with connPool.acquire() as conn:
-        row = await conn.fetchrow("SELECT * FROM Users WHERE login=$1 AND password=$2 LIMIT 1",
+        row = await conn.fetchrow("SELECT * FROM users WHERE login=$1 AND password=$2 LIMIT 1",
             login,
             password
         )

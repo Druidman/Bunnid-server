@@ -1,4 +1,4 @@
-from server.db.tables.userRTSessions import check_if_token_in_db
+from server.db.tables.user_rt_sessions import check_if_token_in_db
 from server.db.utils import DbResult
 from fastapi import Header, HTTPException
 import server.globals as globals

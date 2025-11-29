@@ -3,7 +3,7 @@ import secrets
 from fastapi import Header, HTTPException
 
 import server.globals as globals
-from server.db.tables.userSessions import check_if_token_in_db, add_token_to_db
+from server.db.tables.user_sessions import check_if_token_in_db, add_token_to_db
 
 from server.db.utils import DbResult
 
@@ -18,9 +18,9 @@ async def check_if_valid_token(token: str) -> bool:
 
 
 
-async def make_user_session(userId: str) -> str:
+async def make_user_session(user_id: str) -> str:
     token: str = secrets.token_urlsafe(globals.USER_TOKEN_LENGTH)
-    result: DbResult = await add_token_to_db(token=token, userId=userId, connPool=globals.connPool)  
+    result: DbResult = await add_token_to_db(token=token, user_id=user_id, connPool=globals.connPool)  
     if not result.status:
         print(f"Error when adding token: {result.msg}")
         return ""

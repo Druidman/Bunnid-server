@@ -8,17 +8,17 @@ from pydantic import BaseModel
 
 class APIResponse(BaseModel):
     STATUS: bool
-    MSG: dict | str | bool
+    MSG: dict | str | bool | list
 
 def validateObject(object: dict, keys: list[str]) -> bool:
     return set(object.keys()) == set(keys)
  
 
 def api_response_from_db_repsonse(result: DbResult) -> APIResponse:
-    print(f"DICT: {result.msgDict}")
+    print(f"DICT: {result.msgObject}")
     print(f"MSG: {result.msg}")
-    if result.makeMsgDict():
-        return APIResponse(STATUS=result.status, MSG=result.msgDict)
+    if result.makeMsgObject():
+        return APIResponse(STATUS=result.status, MSG=result.msgObject)
     else:
         return APIResponse(STATUS=result.status, MSG=result.msg)
 

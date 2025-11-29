@@ -5,27 +5,25 @@ from typing import List
 
 class DbResult:
     status: bool = False
-    msg: List[asyncpg.Record] | asyncpg.Record | str | bool = None
+    msg: List[asyncpg.Record] | asyncpg.Record | str | bool | dict  = None
     msgAsDbRowObject: bool = False
-    msgDict: dict = {
-        "dbResult": list
-    }
+    msgObject: list[dict] = []
     def __init__(self, status: bool, msg: List[asyncpg.Record] | asyncpg.Record | str | bool, msgAsDbRowObject = False):
         self.status = status
         self.msg = msg
         self.msgAsDbRowObject = msgAsDbRowObject
 
-    def makeMsgDict(self) -> bool:
+    def makeMsgObject(self) -> bool:
        
         if not self.msgAsDbRowObject: return False
         if not self.msg: return False
         
         if type(self.msg) == asyncpg.Record:
-            self.msgDict["dbResult"] = [dict(self.msg)]
+            self.msgObject = [dict(self.msg)]
           
         elif type(self.msg) == list and type(self.msg[0]) == asyncpg.Record:
 
-            self.msgDict["dbResult"] = [dict(x) for x in self.msg]
+            self.msgObject = [dict(x) for x in self.msg]
             
         else:
             return False
