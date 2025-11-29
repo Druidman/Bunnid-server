@@ -1,30 +1,25 @@
+from typing import Generic, TypeVar, Optional
 import asyncpg
 import asyncio
 from functools import wraps
-from typing import List
 
-class DbResult:
-    status: bool = False
-    msg: List[asyncpg.Record] | asyncpg.Record | str | bool | dict  = None
-    msgAsDbRowObject: bool = False
-    msgObject: list[dict] = []
-    def __init__(self, status: bool, msg: List[asyncpg.Record] | asyncpg.Record | str | bool, msgAsDbRowObject = False):
-        self.status = status
-        self.msg = msg
-        self.msgAsDbRowObject = msgAsDbRowObject
-
-    def makeMsgObject(self) -> bool:
+T = TypeVar("T")
+class DbResult(Generic[T]):
+    error: str = ""
+    result: Optional[T] = None
+    resultJsonable: list[asyncpg.Record] = None
+    def __init__(self, result: Optional[T] = None, error: str = ""):
+        self.error = error
+        self.result = result
        
-        if not self.msgAsDbRowObject: return False
-        if not self.msg: return False
-        
-        if type(self.msg) == asyncpg.Record:
-            self.msgObject = [dict(self.msg)]
-          
-        elif type(self.msg) == list and type(self.msg[0]) == asyncpg.Record:
 
-            self.msgObject = [dict(x) for x in self.msg]
-            
+    def makeResultJsonable(self) -> bool:
+        if not self.result: return False
+
+        if type(self.result) == asyncpg.Record:
+            self.resultJsonable = [dict(self.result)]
+        elif type(self.result) == list[asyncpg.Record]:
+            self.resultJsonable = [dict(x) for x in self.result]
         else:
             return False
         
@@ -42,7 +37,7 @@ def dbFunction(func) -> DbResult:
             try:
                 return await func(*args, **kwargs)
             except Exception as e:
-                return DbResult(False, e.__str__())
+                return DbResult[None](error=e.__str__())
         return async_logic
     else:
         @wraps(func)
@@ -50,5 +45,5 @@ def dbFunction(func) -> DbResult:
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                return DbResult(False, e.__str__())
+                return DbResult[None](error=e.__str__())
         return sync_logic

@@ -27,6 +27,6 @@ async def migrate_chat_system(connPool: asyncpg.Pool) -> DbResult:
             )"""
         )
     
-    return DbResult(True, True)
+    return DbResult[bool](result=True)
     
     

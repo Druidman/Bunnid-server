@@ -5,12 +5,12 @@ from .migrateChatSystem import *
 import asyncpg
 
 async def migrate(connPool: asyncpg.Pool) -> bool:
-    if not await migrate_user_sessions(connPool):
+    if (await migrate_user_sessions(connPool)).error:
         return False
-    if not await migrate_user_RT_sessions(connPool):
+    if (await migrate_user_RT_sessions(connPool)).error:
         return False
-    if not await migrate_users(connPool):
+    if (await migrate_users(connPool)).error:
         return False
-    if not await migrate_chat_system(connPool):
+    if (await migrate_chat_system(connPool)).error:
         return False
     return True

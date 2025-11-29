@@ -11,6 +11,6 @@ async def migrate_user_sessions(connPool: asyncpg.Pool) -> DbResult:
             )"""
         )
     
-    return DbResult(True, True)
+    return DbResult[bool](result=True)
     
     
