@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Optional
+from typing import Awaitable, Callable, Generic, ParamSpec, TypeVar, Optional, Union
 import asyncpg
 import asyncio
 from functools import wraps
@@ -28,22 +28,25 @@ class DbResult(Generic[T]):
 
         
 
+P = ParamSpec("P")
+R = TypeVar("R")
 
-
-def dbFunction(func) -> DbResult:
+def dbFunction(func: Callable[P, R]) -> Callable[P, R]:
     if asyncio.iscoroutinefunction(func):
         @wraps(func)
-        async def async_logic(*args, **kwargs):
+        async def async_logic(*args: P.args, **kwargs: R.kwargs) -> "DbResult[R]":
             try:
-                return await func(*args, **kwargs)
+                result: DbResult[R] = await func(*args, **kwargs)
+                return result
             except Exception as e:
                 return DbResult[None](error=e.__str__())
         return async_logic
     else:
         @wraps(func)
-        def sync_logic(*args, **kwargs):
+        def sync_logic(*args: P.args, **kwargs: R.kwargs) -> DbResult[R]:
             try:
                 return func(*args, **kwargs)
             except Exception as e:
                 return DbResult[None](error=e.__str__())
         return sync_logic
+

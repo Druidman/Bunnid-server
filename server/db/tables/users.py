@@ -1,3 +1,4 @@
+from typing import Optional
 import asyncpg
 from ..utils import DbResult, dbFunction
 
@@ -32,7 +33,7 @@ async def get_full_user(login: str, password: str, connPool: asyncpg.Pool) -> Db
         return DbResult[None](error="Incorrect login or password. User not found")
 
 @dbFunction
-async def add_new_user(name: str, login: str, password: str, connPool: asyncpg.Pool) -> DbResult[None | bool]:
+async def add_new_user(name: str, login: str, password: str, connPool: asyncpg.Pool) -> DbResult[Optional[bool]]:
     if (not name or not login or not password): return DbResult[None](error="Wrong name or password or login")
 
     # check if exists

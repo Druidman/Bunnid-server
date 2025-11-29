@@ -21,8 +21,9 @@ async def login(
     login: str = Body(..., min_length=1),
     password: str = Body(..., min_length=1)
 ) -> globals.APIResponse[LoginResponse]:
-    res: DbResult = await get_full_user(login, password, globals.connPool) 
-    if (not res.status):
+    
+    res: DbResult= await get_full_user(login, password, globals.connPool) 
+    if (res.error):
         return globals.errors["LOGIN_TRY_AGAIN"]
     
     if (not res.msg):
