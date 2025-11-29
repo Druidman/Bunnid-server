@@ -5,11 +5,21 @@ import uvicorn
 import server.globals as globals
 from server.db import setup_db
 from server.eventPool import setupEventPool
+from contextlib import asynccontextmanager
 
+@asynccontextmanager
+async def app_lifespan(app: FastAPI):
+    #startup
+    await setup_db()
+    setupEventPool() # setup events
 
+    yield
+
+    #shutdown
+    globals.connPool.close()
 
 def run_http_server() -> None:
-    app = FastAPI()
+    app = FastAPI(lifespan=app_lifespan)
     origins = [
         "http://localhost:5173"
     ]
@@ -20,10 +30,7 @@ def run_http_server() -> None:
         allow_methods=["*"],   
         allow_headers=["*"],   
     )
-    @app.on_event("startup")
-    async def startup():
-        await setup_db()
-        setupEventPool() # setup events
+    
 
     @app.get("/healthz")
     async def healthz() -> dict[str, str]:
