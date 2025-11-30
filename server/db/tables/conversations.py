@@ -2,7 +2,7 @@ import asyncpg
 from ..utils import DbResult, dbFunction
 
 @dbFunction
-async def get_conversation(conv_id: int, connPool: asyncpg.Pool) -> DbResult:
+async def get_conversation(conv_id: int, connPool: asyncpg.Pool) -> DbResult[asyncpg.Record | None]:
     if (conv_id <= -1):
         return DbResult[None](error="wrong conv_id")
     
@@ -16,7 +16,7 @@ async def get_conversation(conv_id: int, connPool: asyncpg.Pool) -> DbResult:
     return DbResult[asyncpg.Record](result=row)
 
 @dbFunction
-async def get_conversations(limit: int, connPool: asyncpg.Pool) -> DbResult:
+async def get_conversations(limit: int, connPool: asyncpg.Pool) -> DbResult[list[asyncpg.Record] | None]:
     if (limit <= 0):
         return DbResult[None](error="wrong limit")
     async with connPool.acquire() as conn:
@@ -31,7 +31,7 @@ async def get_conversations(limit: int, connPool: asyncpg.Pool) -> DbResult:
 
 
 @dbFunction
-async def get_conversation_by_title(title: str, connPool: asyncpg.Pool) -> DbResult:
+async def get_conversation_by_title(title: str, connPool: asyncpg.Pool) -> DbResult[asyncpg.Record | None]:
     if (title == ""):
         return DbResult[None](error="wrong conv title")
     async with connPool.acquire() as conn:
@@ -43,7 +43,7 @@ async def get_conversation_by_title(title: str, connPool: asyncpg.Pool) -> DbRes
 
 
 @dbFunction
-async def add_conversation(title: str, connPool: asyncpg.Pool) -> DbResult:
+async def add_conversation(title: str, connPool: asyncpg.Pool) -> DbResult[bool | None]:
     if (title==""):
         return DbResult[None](error="wrong title")
     async with connPool.acquire() as conn:

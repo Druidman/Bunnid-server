@@ -20,7 +20,7 @@ async def get_realtime_session() -> globals.APIResponse[RtSessionResponse]:
     if (not rts_token):
         return globals.errors["FAILED_TO_ASSIGN_TOKEN"]
     
-    return globals.API_RESPONSE(True, {"token":rts_token})
+    return globals.API_RESPONSE(response={"token":rts_token})
 
 
 
