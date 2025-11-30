@@ -2,7 +2,7 @@
 
 from server.ws.communication.wsMessage import WsMessage
 from server.ws.communication.wsEvent import WsEvent
-from typing import Any, Callable, Generator, List, NoReturn
+from typing import Callable, List
 
 
 from server.db.tables.messages import get_message
@@ -36,11 +36,11 @@ class Client:
     async def sendNewConversationMsg(self,messageId: int) -> None: 
         print(f"sending new conversation msg TODO ID: {messageId}")
         messageRes: DbResult = await get_message(messageId, globals.connPool)
-        if not messageRes.status:
+        if messageRes.error:
             return
         
-        if messageRes.makeMsgObject():
-            await self.sendMsg(WsMessage(WsEvent.NEW_CONVERSATION_MSG__INFO, "", next(self.requestIdGen), messageRes.msgObject))
+        if messageRes.makeResultJsonable():
+            await self.sendMsg(WsMessage(WsEvent.NEW_CONVERSATION_MSG__INFO, "", next(self.requestIdGen), messageRes.resultJsonable))
         
     def registerNewConversationMsgEventListener(self, conversationId: int) -> None:
         listener: ConversationMsgEventListener = ConversationMsgEventListener(self.sendNewConversationMsg, conversationId=int(conversationId))
@@ -70,8 +70,6 @@ class Client:
             ))
             print("Rt messaging req granted")
         
-    
-            pass
 
     def getEventHandler(self, event: WsEvent) -> Callable[[WsMessage], None] | None:
         return self.eventHandlers.get(event)
