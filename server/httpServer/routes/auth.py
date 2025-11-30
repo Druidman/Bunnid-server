@@ -38,7 +38,7 @@ async def login(
         })
 
 class RegisterResponse(BaseModel):
-    result: bool
+    result: bool | None
 
 @auth_router.post("/register")
 async def register(
@@ -47,10 +47,10 @@ async def register(
     name: str = Body(..., min_length=1)
 ) -> globals.APIResponse[RegisterResponse]:
     if (not name or not login or not password):
-        return globals.API_RESPONSE[None](error="Password, name, login not provided", response=None)
+        return globals.API_RESPONSE[None](error="Password, name, login not provided")
     
     res: DbResult[Optional[bool]] = await add_new_user(name, login, password, globals.connPool)
     
-    return globals.API_RESPONSE(error=res.error, response=res.result)
+    return globals.API_RESPONSE(error=res.error, response={"result": res.result})
 
 

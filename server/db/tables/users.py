@@ -39,13 +39,13 @@ async def add_new_user(name: str, login: str, password: str, connPool: asyncpg.P
     # check if exists
     nameResult: DbResult = await get_user_by_name(name, connPool)
     loginResult: DbResult = await get_user_by_login(login, connPool)
-    if (not nameResult.status or not loginResult.status):
-        return DbResult[None](error=f'NAME: {nameResult.msg} LOGIN: {loginResult.msg}')
+    if (nameResult.error or loginResult.error):
+        return DbResult[None](error=f'NAME: {nameResult.error} LOGIN: {loginResult.error}')
     
-    if (nameResult.msg):
+    if (nameResult.result):
         return DbResult[None](error=f"Account of this name already exists")
     
-    if (loginResult.msg):
+    if (loginResult.result):
         return DbResult[None](error=f"Account of this login already exists")
     
     async with connPool.acquire() as conn:

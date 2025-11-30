@@ -11,18 +11,18 @@ async def check_if_valid_token(token: str) -> bool:
     if (token == ""): return False
     if (len(token) < globals.USER_TOKEN_LENGTH): return False
 
-    result: DbResult = await check_if_token_in_db(token, globals.connPool) 
-    if not result.status:
+    result: DbResult[bool | None] = await check_if_token_in_db(token, globals.connPool) 
+    if result.error:
         return False
-    return result.msg
+    return result.result
 
 
 
 async def make_user_session(user_id: str) -> str:
     token: str = secrets.token_urlsafe(globals.USER_TOKEN_LENGTH)
     result: DbResult = await add_token_to_db(token=token, user_id=user_id, connPool=globals.connPool)  
-    if not result.status:
-        print(f"Error when adding token: {result.msg}")
+    if result.error:
+        print(f"Error when adding token: {result.error}")
         return ""
     else:
         return token

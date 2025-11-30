@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter
-from server.httpServer.session.rt_session import make_RTS
+from server.httpServer.auth.rt_session import make_RTS
 
 import server.globals as globals
 from pydantic import BaseModel

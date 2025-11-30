@@ -1,6 +1,7 @@
 
 from ast import Dict
 from typing import TypedDict
+import asyncpg
 from fastapi import APIRouter, Body
 from server.db.tables.conversations import get_conversation, add_conversation, get_conversations
 from server.db.tables.messages import get_messages, add_message
@@ -37,7 +38,7 @@ async def conversationSendMsg(
         connPool=globals.connPool
     )
     print(f"FETCHED ID: {result.result}")
-    await globals.eventPool.notify_event(EventType.NEW_MSG_IN_CONVERSATION, ConversationMsgEventData(conversationId, result.msg))
+    await globals.eventPool.notify_event(EventType.NEW_MSG_IN_CONVERSATION, ConversationMsgEventData(conversationId, result.result))
     return globals.api_response_from_db_repsonse(result,wrapperKey="message_id")
   
 
@@ -90,7 +91,7 @@ async def conversationGetMembers(
 ) -> globals.APIResponse[ConversationGetMembersResponse]:
     result = await get_members(conv_id=conversationId, connPool=globals.connPool)
 
-    return globals.api_response_from_db_repsonse(result)
+    return globals.api_response_from_db_repsonse(result, wrapperKey="members")
 
 class ConversationModel(BaseModel):
     title: str
@@ -103,15 +104,18 @@ async def conversationGet(
 ) -> globals.APIResponse[ConversationGetResponse]:
     result = await get_conversation(conv_id=conversationId, connPool=globals.connPool)
 
-    return globals.api_response_from_db_repsonse(result)
+    return globals.api_response_from_db_repsonse(result, wrapperKey = "conversation")
 
 class ConversationListResponse(BaseModel):
     conversations: list[ConversationModel]
 
 @conversation_router.get("/list")
 async def conversationList() -> globals.APIResponse[ConversationListResponse]:
-    result: DbResult = await get_conversations(limit=100, connPool=globals.connPool)
-    return globals.api_response_from_db_repsonse(result)
+    result: DbResult[list[asyncpg.Record] | None] = await get_conversations(limit=100, connPool=globals.connPool)
+    print(result.result)
+    result.makeResultJsonable()
+    print(result.resultJsonable)
+    return globals.api_response_from_db_repsonse(result, wrapperKey="conversations")
 
 
     
