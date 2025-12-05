@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import *
-import uvicorn
+import uvicorn, os
 import server.globals as globals
 from server.db import setup_db
 from server.eventPool import setupEventPool
@@ -47,5 +47,5 @@ def run_http_server() -> None:
 
     app.include_router(api)
     
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=os.environ.get("PORT", 5000))
 
