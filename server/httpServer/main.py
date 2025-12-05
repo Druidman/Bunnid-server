@@ -23,6 +23,9 @@ def run_http_server() -> None:
     origins = [
         "http://localhost:5173"
     ]
+    app_url = os.getenv("BUNNID_APP_URL", "")
+    if app_url:
+        origins.append(app_url)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins, 
