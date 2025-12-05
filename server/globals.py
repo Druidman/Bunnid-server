@@ -39,7 +39,6 @@ USER_TOKEN_LENGTH: int = 15
 RTS_TOKEN_LENGTH: int = 15
 connPool: asyncpg.Pool | None = None
 eventPool: EventPool = None
-conversation_msg_event: ConversationMsgEvent = None
 
 
 errors = {

@@ -1,4 +1,4 @@
-from server.server.eventPool import ConversationMsgEvent
+from server.eventPool.events import ConversationMsgEvent
 from .EventType import EventType
 from .events.Event import Event
 from typing import Dict

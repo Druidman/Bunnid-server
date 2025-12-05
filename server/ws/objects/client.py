@@ -1,5 +1,6 @@
 
 
+from server.eventPool.EventPool import EventType
 from server.ws.communication.wsMessage import WsMessage
 from server.ws.communication.wsEvent import WsEvent
 from typing import Callable, List
@@ -18,7 +19,6 @@ class Client:
     def __init__(self, connection: WebSocket):
         self.connection = connection
 
-        self.eventSenders: List[EventListener] = []
 
         self.msgResponseWaiters: dict[int, Callable[[WsMessage], None]] = {}
         self.eventHandlers: dict[WsEvent, Callable[[WsMessage], None]] = {
@@ -44,8 +44,8 @@ class Client:
         
     def registerNewConversationMsgEventListener(self, conversationId: int) -> None:
         listener: ConversationMsgEventListener = ConversationMsgEventListener(self.sendNewConversationMsg, conversationId=int(conversationId))
-        globals.conversation_msg_event.add_listener(listener)
-        self.eventSenders.append(listener)
+        globals.eventPool.events[EventType.NEW_MSG_IN_CONVERSATION].add_listener(listener)
+        
 
     async def handleRtMessagesInConversationMsg(self, msg: WsMessage) -> None:
         if not globals.validateObject(msg.data, keys=["conversationId"]) or msg.event != WsEvent.RT_MESSAGES_IN_CONVERSATION or msg.error:
