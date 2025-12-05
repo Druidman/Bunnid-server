@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from .routes import *
 import uvicorn, os
 import server.globals as globals
@@ -26,6 +27,8 @@ def run_http_server() -> None:
     app_url = os.getenv("BUNNID_APP_URL", "")
     if app_url:
         origins.append(app_url)
+    else:
+        print("No app url found")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins, 
@@ -39,6 +42,18 @@ def run_http_server() -> None:
     async def healthz() -> dict[str, str]:
         
         return {"status": "OK"}
+    
+    @app.middleware("http")
+    async def block_ips(request: Request, call_next):
+        client_ip = request.client.host
+
+        if client_ip == "83.25.221.83":
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Forbidden"},
+            )
+
+        return await call_next(request)
     
 
     api = APIRouter(prefix="/api")
