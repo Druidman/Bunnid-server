@@ -1,15 +1,14 @@
 import asyncpg
-
+import os
 from .migrations import migrate
 
 
 async def connectDb() ->  asyncpg.Pool | None:
+    DATABASE_URL = os.getenv("BUNNID_DB_URL", "NONE")
+    if DATABASE_URL == "NONE":
+        return None
     pool:  asyncpg.Pool = await asyncpg.create_pool(
-        user="bunnidAdmin",
-        password="nimda",
-        database="bunnidDb",
-        host='localhost',
-        port=5432,
+        DATABASE_URL,
         min_size=5,
         max_size=20
     )

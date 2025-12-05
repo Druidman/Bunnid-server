@@ -16,7 +16,7 @@ async def app_lifespan(app: FastAPI):
     yield
 
     #shutdown
-    globals.connPool.close()
+    await globals.connPool.close()
 
 def run_http_server() -> None:
     app = FastAPI(lifespan=app_lifespan)
