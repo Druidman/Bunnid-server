@@ -1,12 +1,12 @@
 from typing import Optional
 import asyncpg
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Response, HTTPException
 from server.db.tables.users import add_new_user, get_full_user
-from ..auth import make_user_session
 from pydantic import BaseModel
-
+from server.httpServer.auth import create_session_refresh_token
 import server.globals as globals
 from server.db.utils import DbResult
+import urllib.parse
 
 auth_router = APIRouter(prefix="/auth")
 
@@ -15,27 +15,45 @@ async def testRoute() -> str:
     return "<h1>Auth Bunnid API</h1>"
 
 class LoginResponse(BaseModel):
-    token: str
     user_id: int
 
 @auth_router.post("/login")
 async def login(
+    response: Response,
     login: str = Body(..., min_length=1),
     password: str = Body(..., min_length=1)
+    
 ) -> globals.APIResponse[LoginResponse]:
     
     res: DbResult[Optional[asyncpg.Record]] = await get_full_user(login, password, globals.connPool) 
     if (res.error):
         return globals.API_RESPONSE(error=res.error, response=None)
     
-    token = await make_user_session(user_id=res.result.get("id"))
-    if not token:
-        return globals.errors["FAILED_TO_ASSIGN_TOKEN"]
-    else:
-        return globals.API_RESPONSE(response = {
-            "token": token, 
-            "user_id": res.result.get("id")
-        })
+    user_id = res.result.get("id")
+    
+    # now we have verified that request is comming from client who knows auth reqired info
+    # This means that we need to generate some way to authenticate client without password and login later on
+
+    # For that we:
+
+    # Create jwt refresh token
+    session_refresh_token: str = await create_session_refresh_token(user_id)
+    if not session_refresh_token:
+        raise HTTPException(status_code=500, detail="session refresh token not properly created")
+    
+    # sending token in cookie
+    response.set_cookie(
+        key="session-refresh-token",
+        value=session_refresh_token,
+        httponly=True, # protects against xss token steal
+        samesite="strict", # protects against csrf attack
+        secure=globals.PRODUCTION, # http/https
+    )
+
+    return globals.API_RESPONSE(response={
+        "user_id": user_id
+    })
+
 
 class RegisterResponse(BaseModel):
     result: bool | None

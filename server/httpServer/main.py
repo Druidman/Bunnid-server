@@ -22,7 +22,7 @@ async def app_lifespan(app: FastAPI):
 def run_http_server() -> None:
     app = FastAPI(lifespan=app_lifespan)
     origins = [
-        "http://localhost:5173"
+        "http://localhost:3000"
     ]
     app_url = os.getenv("BUNNID_APP_URL", "")
     if app_url:
@@ -65,5 +65,4 @@ def run_http_server() -> None:
 
     app.include_router(api)
     
-    uvicorn.run(app, host="0.0.0.0", port=os.environ.get("PORT", 5000))
-
+    uvicorn.run(app, host="localhost", port=os.environ.get("PORT", 8000))

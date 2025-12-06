@@ -1,8 +1,7 @@
 
-import asyncpg
+import asyncpg, os
 from server.db.utils import DbResult
 from server.eventPool.EventPool import EventPool
-from server.eventPool.events.ConversationMsgEvent import ConversationMsgEvent
 from pydantic import BaseModel
 from typing import Generic, Optional, TypeVar
 
@@ -34,13 +33,18 @@ def api_response_from_db_repsonse(result: DbResult, wrapperKey: str = "") -> API
 def API_RESPONSE(error: str ="", response: Optional[T] = None) -> APIResponse:
     return APIResponse(error=error, response=response)
 
+def raise_exception(value: str):
+    raise Exception(value)
 
-USER_TOKEN_LENGTH: int = 15
 RTS_TOKEN_LENGTH: int = 15
 connPool: asyncpg.Pool | None = None
 eventPool: EventPool = None
 
-
+PRODUCTION = True if os.getenv("PRODUCTION") == "TRUE" else False
+USER_SESSION_TOKEN_EXPIRY_SECONDS = int(os.getenv("USER_SESSION_TOKEN_EXPIRY_SECONDS", 60))
+USER_SESSION_TOKEN_SECRET_KEY = os.getenv("USER_SESSION_TOKEN_SECRET_KEY", "")
+USER_SESSION_TOKEN_ALGORITHM = os.getenv("USER_SESSION_TOKEN_ALGORITHM", "HS256")
+print(USER_SESSION_TOKEN_ALGORITHM, " ", USER_SESSION_TOKEN_EXPIRY_SECONDS, " ", USER_SESSION_TOKEN_SECRET_KEY)
 errors = {
 
     "NO_JSON": API_RESPONSE(error="No json found in request"),
