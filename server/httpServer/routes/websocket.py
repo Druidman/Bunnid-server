@@ -7,11 +7,11 @@ from server.httpServer.auth.session_token import verify_session_token
 websocket_router = APIRouter(prefix="/ws")
 
 @websocket_router.websocket("/")
-async def websocketMain(websocket: WebSocket, token: str = Query(...)) -> str:
+async def websocketMain(websocket: WebSocket, session_token: str = Query(...)) -> str:
 
     try:
         await websocket.accept()
-        if (not await verify_session_token(token)):
+        if (not await verify_session_token(session_token)):
             await websocket.close()
             return
         
