@@ -1,8 +1,7 @@
 from fastapi import APIRouter, WebSocket, Query, WebSocketDisconnect, WebSocketException
 
-from server.httpServer.auth.rt_session import check_if_valid_rts_token
-
 from server.ws.objects.client import Client
+from server.httpServer.auth.session_token import verify_session_token
 
 
 websocket_router = APIRouter(prefix="/ws")
@@ -12,7 +11,7 @@ async def websocketMain(websocket: WebSocket, token: str = Query(...)) -> str:
 
     try:
         await websocket.accept()
-        if (not await check_if_valid_rts_token(token)):
+        if (not await verify_session_token(token)):
             await websocket.close()
             return
         

@@ -14,18 +14,18 @@ async def check_if_token_in_db(id: int, connPool: asyncpg.Pool) -> DbResult[None
         return DbResult[bool](result=False) 
    
 @dbFunction
-async def add_token_to_db(user_id: int, created_at: datetime.datetime, expires_at: datetime.datetime, connPool: asyncpg.Pool) -> DbResult[None | int]:
+async def add_token_to_db(user_id: int, created_at: datetime.date, expires_at: datetime.date, connPool: asyncpg.Pool) -> DbResult[None | int]:
     if (user_id <= -1 or not created_at or not expires_at):
         return DbResult[None](error="Wrong user_id or datetime for creation and expiration")
     async with connPool.acquire() as conn:
-        result = await conn.fetchval(
+        result: int = await conn.fetchval(
             "INSERT INTO session_refresh_tokens(user_id, created_at, expires_at) VALUES($1,$2,$3) RETURNING id", 
             user_id, 
-            created_at.isoformat(),
-            expires_at.isoformat()
+            created_at,
+            expires_at
         )
     if result:
-        return DbResult[int](result=result.get("id")) 
+        return DbResult[int](result=result) 
 
     return DbResult[None](error="No token id returned by db") 
 
