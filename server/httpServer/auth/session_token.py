@@ -1,5 +1,6 @@
 import datetime
-from fastapi import HTTPException, Cookie
+from typing import Annotated
+from fastapi import HTTPException, Header
 from .jwt import create_jwt, verify_jwt
 import server.globals as globals
 
@@ -15,6 +16,13 @@ async def verify_session_token(session_token: str) -> dict:
         raise HTTPException(status_code=406, detail="No payload in token found")
     
     return payload
+
+
+async def verify_session_token_header(session_token: Annotated[str | None, Header()]) -> dict:
+    if not session_token:
+        raise HTTPException(status_code=406, detail="No token found") 
+    return await verify_session_token(session_token=session_token)
+
 
 async def create_session_token(user_id: int) -> str:
     if not user_id:

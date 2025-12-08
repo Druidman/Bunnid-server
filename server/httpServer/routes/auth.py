@@ -1,7 +1,7 @@
 import datetime
-from typing import Optional
+from typing import Annotated, Optional
 import asyncpg
-from fastapi import APIRouter, Body, Response, HTTPException, Cookie
+from fastapi import APIRouter, Body, Depends, Response, HTTPException, Cookie
 from server.db.tables.users import add_new_user, get_full_user
 from pydantic import BaseModel
 from server.httpServer.auth import create_jwt, create_session_refresh_token, verify_jwt

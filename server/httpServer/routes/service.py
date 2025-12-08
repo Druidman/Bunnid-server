@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from .services import conversation_router
 from .services import database_router
-from server.httpServer.auth.session_refresh_token import verify_session_refresh_token
+from server.httpServer.auth.session_token import verify_session_token_header
 
-service_router = APIRouter(prefix="/service", dependencies=[Depends(verify_session_refresh_token)])
+service_router = APIRouter(prefix="/service", dependencies=[Depends(verify_session_token_header)])
 
 service_router.include_router(conversation_router)
 service_router.include_router(database_router)
