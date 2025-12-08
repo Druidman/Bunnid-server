@@ -17,17 +17,18 @@ async def verify_session_refresh_token(session_refresh_token: str) -> dict:
         raise HTTPException(status_code=406, detail="No payload in token found")
     
     # now that it is verified that token has been created on server and is authentic we can check if is revoked
-    result: DbResult[Optional[bool]] = await check_if_token_revoked(payload.get("token_id"))
+    result: DbResult[Optional[bool]] = await check_if_token_revoked(payload.get("token_id"), connPool=globals.connPool)
 
     if result.error:
         raise HTTPException(status_code=500, detail=result.error)
     
-    if not result.result:
+    if result.result:
         raise HTTPException(status_code=401, detail="Not valid token")
     
     return payload
 
 async def verify_session_refresh_token_cookie(session_refresh_token: str = Cookie(None)) -> dict:
+    
     return verify_session_refresh_token(session_refresh_token=session_refresh_token)
 
 async def create_session_refresh_token(user_id: int) -> str:

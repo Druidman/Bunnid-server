@@ -18,9 +18,15 @@ async def verify_session_token(session_token: str) -> dict:
     return payload
 
 
-async def verify_session_token_header(session_token: Annotated[str | None, Header()]) -> dict:
-    if not session_token:
+async def verify_session_token_header(authorization: Annotated[str | None, Header()]) -> dict:
+    if not authorization:
         raise HTTPException(status_code=406, detail="No token found") 
+    
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=406, detail="Invalid authorization header form") 
+    
+    session_token: str = authorization[len("Bearer "):]
+    print(f"Token: {session_token}")
     return await verify_session_token(session_token=session_token)
 
 

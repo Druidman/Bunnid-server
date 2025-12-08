@@ -7,7 +7,7 @@ async def check_if_token_in_db(id: int, connPool: asyncpg.Pool) -> DbResult[None
     if not id:
         return DbResult[None](error="No token_id provided") 
     async with connPool.acquire() as conn:
-        row = await conn.fetchrow("SELECT 1 FROM session_refresh_tokens WHERE id=$1",id)
+        row = await conn.fetchrow("SELECT 1 FROM session_refresh_tokens WHERE id=$1",int(id))
     if (row):
         return DbResult[bool](result=True) 
     else:
@@ -20,7 +20,7 @@ async def add_token_to_db(user_id: int, created_at: datetime.date, expires_at: d
     async with connPool.acquire() as conn:
         result: int = await conn.fetchval(
             "INSERT INTO session_refresh_tokens(user_id, created_at, expires_at) VALUES($1,$2,$3) RETURNING id", 
-            user_id, 
+            int(user_id), 
             created_at,
             expires_at
         )
@@ -38,7 +38,7 @@ async def check_if_token_revoked(id: int, connPool: asyncpg.Pool) -> DbResult[No
     
 
     async with connPool.acquire() as conn:
-        row: asyncpg.Record = await conn.fetchrow("SELECT revoked FROM session_refresh_tokens WHERE id=$1",id)
+        row: asyncpg.Record = await conn.fetchrow("SELECT revoked FROM session_refresh_tokens WHERE id=$1",int(id))
 
     if not row:
         return DbResult[bool](result=False) 

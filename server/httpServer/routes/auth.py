@@ -1,7 +1,7 @@
 import datetime
 from typing import Annotated, Optional
 import asyncpg
-from fastapi import APIRouter, Body, Depends, Response, HTTPException, Cookie
+from fastapi import APIRouter, Body, Depends, Header, Response, HTTPException, Cookie
 from server.db.tables.users import add_new_user, get_full_user
 from pydantic import BaseModel
 from server.httpServer.auth import create_jwt, create_session_refresh_token, verify_jwt
@@ -80,15 +80,18 @@ class GetSessionResponse(BaseModel):
     session_token: str
 
 @auth_router.get("/get_session")
-async def get_session(session_refresh_token: str = Cookie(None)) -> globals.APIResponse[GetSessionResponse]:
+async def get_session(session_refresh_token: str = Cookie(None, alias="session-refresh-token")) -> globals.APIResponse[GetSessionResponse]:
+    print(f"token: {session_refresh_token}")
     payload: dict = await verify_session_refresh_token(session_refresh_token=session_refresh_token)
     if not payload:
         raise HTTPException(status_code=500, detail="Something went wrong with token validation")
     
     # now we are sure that user has credentials to request new session token
+    
+        
 
     expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=globals.SESSION_TOKEN_EXPIRY_MINUTES)
-    session_token = create_jwt(
+    session_token: str = create_jwt(
         sub=payload.get("sub"),
         expires_at=expires_at,
         secret=globals.SESSION_TOKEN_SECRET_KEY,
@@ -96,6 +99,8 @@ async def get_session(session_refresh_token: str = Cookie(None)) -> globals.APIR
     )
     if not session_token:
         raise HTTPException(status_code=500, detail="Something went wrong during token generation")
+    
+
     
 
     return globals.API_RESPONSE(response={
