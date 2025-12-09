@@ -66,4 +66,4 @@ def run_http_server() -> None:
 
     app.include_router(api)
     
-    uvicorn.run(app, host="localhost", port=os.environ.get("PORT", 8000))
+    uvicorn.run(app, host=os.environ.get("HOST", "0.0.0.0"), port=os.environ.get("PORT", 8000))
