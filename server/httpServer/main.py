@@ -22,7 +22,8 @@ async def app_lifespan(app: FastAPI):
 def run_http_server() -> None:
     app = FastAPI(lifespan=app_lifespan)
     origins = [
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "https://bunnid-app.onrender.com"
     ]
     app_url = os.getenv("BUNNID_APP_URL", "")
     if app_url:
