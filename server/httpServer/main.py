@@ -1,3 +1,4 @@
+from pathlib import Path
 from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -7,6 +8,8 @@ import server.globals as globals
 from server.db import setup_db
 from server.eventPool import setupEventPool
 from contextlib import asynccontextmanager
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
@@ -37,7 +40,12 @@ def run_http_server() -> None:
         allow_methods=["*"],   
         allow_headers=["*"],   
     )
-    
+    dist_path = Path("server/reactApp/dist")
+    app.mount("/assets", StaticFiles(directory=dist_path / "assets"), name="assets")
+     
+    @app.get("/app/{full_path:path}")
+    async def spa_fallback(full_path: str):
+        return FileResponse(dist_path / "index.html")
 
     @app.get("/healthz")
     async def healthz() -> dict[str, str]:
@@ -67,3 +75,9 @@ def run_http_server() -> None:
     app.include_router(api)
     
     uvicorn.run(app, host=os.environ.get("HOST", "0.0.0.0"), port=os.environ.get("PORT", 8000))
+
+
+
+
+# app.bunnid.com - frontend
+# api.bunnid.com - backend
