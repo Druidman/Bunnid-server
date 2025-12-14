@@ -2,7 +2,7 @@
 from ast import Dict
 from typing import TypedDict
 import asyncpg
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException
 from server.db.tables.conversations import get_conversation, add_conversation, get_conversations
 from server.db.tables.messages import get_messages, add_message
 from server.db.tables.conversation_members import add_member, get_members
@@ -31,6 +31,8 @@ async def conversationSendMsg(
     msgContent: str = Body(...),
     userId: int = Body(...)
 ) -> globals.APIResponse[ConversationSendResponse]:
+    if len(msgContent) > 300:
+        raise HTTPException(status_code=413, detail="Msg too big")
     result: DbResult = await add_message(
         conv_id=conversationId, 
         user_id=userId, 

@@ -51,6 +51,7 @@ async def login(
         httponly=True, # protects against xss token steal
         samesite="strict", # protects against csrf attack
         secure=globals.PRODUCTION, # http/https
+        path="/"
     )
 
     return globals.API_RESPONSE(response={
@@ -82,9 +83,13 @@ class GetSessionResponse(BaseModel):
 @auth_router.get("/get_session")
 async def get_session(session_refresh_token: str = Cookie(None, alias="session-refresh-token")) -> globals.APIResponse[GetSessionResponse]:
     print(f"token: {session_refresh_token}")
-    payload: dict = await verify_session_refresh_token(session_refresh_token=session_refresh_token)
-    if not payload:
-        raise HTTPException(status_code=500, detail="Something went wrong with token validation")
+    try:
+        payload: dict = await verify_session_refresh_token(session_refresh_token=session_refresh_token)
+        if not payload:
+            raise HTTPException(status_code=500, detail="Something went wrong with token validation")
+    except:
+        raise
+
     
     # now we are sure that user has credentials to request new session token
     

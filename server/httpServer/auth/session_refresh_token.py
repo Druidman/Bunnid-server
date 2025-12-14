@@ -4,14 +4,24 @@ from typing import Optional
 from server.db.tables.session_refresh_tokens import add_token_to_db, check_if_token_revoked
 from fastapi import HTTPException, Cookie
 from .jwt import create_jwt, verify_jwt
+import jwt
 import server.globals as globals
 
 async def verify_session_refresh_token(session_refresh_token: str) -> dict:
-    payload: dict = verify_jwt(
-        jwt_token=session_refresh_token, 
-        secret=globals.SESSION_REFRESH_TOKEN_SECRET_KEY,
-        algorithms=[globals.SESSION_REFRESH_TOKEN_ALGORITHM]
-    )
+    print(f"Session refresh token: {session_refresh_token}")
+    try:
+        payload: dict = verify_jwt(
+            jwt_token=session_refresh_token, 
+            secret=globals.SESSION_REFRESH_TOKEN_SECRET_KEY,
+            algorithms=[globals.SESSION_REFRESH_TOKEN_ALGORITHM]
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Token invalid")
+    except:
+        raise HTTPException(status_code=401, detail="Token validation went wrong")
+
     
     if not payload:
         raise HTTPException(status_code=406, detail="No payload in token found")
@@ -28,8 +38,11 @@ async def verify_session_refresh_token(session_refresh_token: str) -> dict:
     return payload
 
 async def verify_session_refresh_token_cookie(session_refresh_token: str = Cookie(None)) -> dict:
-    
-    return verify_session_refresh_token(session_refresh_token=session_refresh_token)
+    try:
+        res = verify_session_refresh_token(session_refresh_token=session_refresh_token)
+        return res
+    except:
+        raise
 
 async def create_session_refresh_token(user_id: int) -> str:
     if not user_id:
@@ -65,3 +78,5 @@ async def create_session_refresh_token(user_id: int) -> str:
         raise HTTPException(status_code=500, detail=f"Smth went wrong when making refresh token: {e}")
     
     return refresh_token
+
+

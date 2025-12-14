@@ -3,14 +3,21 @@ from typing import Annotated
 from fastapi import HTTPException, Header
 from .jwt import create_jwt, verify_jwt
 import server.globals as globals
-
+import jwt
 
 async def verify_session_token(session_token: str) -> dict:
-    payload: dict = verify_jwt(
-        jwt_token=session_token, 
-        secret=globals.SESSION_TOKEN_SECRET_KEY,
-        algorithms=[globals.SESSION_TOKEN_ALGORITHM]
-    )
+    try:
+        payload: dict = verify_jwt(
+            jwt_token=session_token, 
+            secret=globals.SESSION_TOKEN_SECRET_KEY,
+            algorithms=[globals.SESSION_TOKEN_ALGORITHM]
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Token invalid")
+    except:
+        raise HTTPException(status_code=401, detail="Token validation went wrong")
     
     if not payload:
         raise HTTPException(status_code=406, detail="No payload in token found")
